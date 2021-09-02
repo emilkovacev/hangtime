@@ -5,23 +5,43 @@ class MyTCPHandler(socketserver.BaseRequestHandler):
     def find_path(self, request):
         return request.split(' ')[1]
 
+    def send_response(self, response):
+        response = """HTTP/1.1 301 Moved Permanently\r\n
+                   Location: /hello""".encode()
+        
+        self.request.sendall(response.encode())
+
     def handle(self):
         recieved_data = self.request.recv(1024).strip() # recieve data
         path = self.find_path(recieved_data.decode())   # find host from decoded str
 
-        if path == '/hello':
-            response =  """HTTP/1.1 200 OK\r\n
-                        Content-Length: 12\r\n\r\n
-                        Hello world!""".encode()        # encode response body
-            self.request.sendall(response)              # send response
+        if path == '/hi':
+            self.send_response(
+                """
+                HTTP/1.1 301 Moved Permanently\r\n
+                Location: /hello
+                """
+            )
+
+        elif path == '/hello':
+            self.send_response(
+                """
+                HTTP/1.1 200 OK\r\n
+                Content-Length: 12\r\n\r\n
+                Hello world!
+                """
+            )
 
         else:
-            response =  """HTTP/1.1 404 Not Found\r\n
-                        Content-Type: text/plain\r\n
-                        content-length: 36\r\n\r\n
-                        The requested content does not exist""".encode()
+            self.send_response(
+                """
+                HTTP/1.1 404 Not Found\r\n
+                Content-Type: text/plain\r\n
+                content-length: 36\r\n\r\n
+                The requested content does not exist
+                """
+            )
 
-            self.request.sendall(response)
 
 
 if __name__ == '__main__':
