@@ -1,6 +1,7 @@
 import unittest
 from http_parse import ParseTools as pt
 
+
 class TestRequest(unittest.TestCase):
     def test_no_body(self):
         http_input = 'GET /hello HTTP/1.1\r\nHost: cse312.com'
@@ -41,9 +42,9 @@ class TestResponse(unittest.TestCase):
 
         self.assertEqual(expected_output, output)
 
-
     def test_body(self):
-        expected_output = 'HTTP/1.1 404 Not Found\r\nContent-Type: text/plain\r\nContent-Length: 36\r\n\r\nThe requested content does not exist'
+        expected_output = 'HTTP/1.1 404 Not Found\r\nContent-Type: text/plain\r\nContent-Length: 36\r\n\r\nThe ' \
+                          'requested content does not exist '
         output = pt.write_response(
             status_code=404,
             status_message='Not Found',

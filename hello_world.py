@@ -1,13 +1,15 @@
 import socketserver
 from http_response import *  # a library I wrote while working on this project
 
+
 class MyTCPHandler(socketserver.BaseRequestHandler):
     def send_response(self, response):
+        print(response)
         self.request.sendall(response.encode())
 
     def handle(self):
-        recieved_data = self.request.recv(1024).strip()                 # recieve data
-        parsed: {str: str} = pt.parse_request(recieved_data.decode())   # parse decoded input into dict
+        received_data = self.request.recv(1024).strip()  # receive data
+        parsed: {str: str} = pt.parse_request(received_data.decode())  # parse decoded input into dict
 
         path = parsed['path']
         if path == '/hi':
