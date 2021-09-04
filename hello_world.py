@@ -1,52 +1,31 @@
 import socketserver
+from http_response import *  # a library I wrote while working on this project
 
 class MyTCPHandler(socketserver.BaseRequestHandler):
-    @classmethod
-    def find_path(self, request):
-        return request.split(' ')[1]
-
     def send_response(self, response):
-        response = """HTTP/1.1 301 Moved Permanently\r\n
-                   Location: /hello""".encode()
-        
         self.request.sendall(response.encode())
 
     def handle(self):
-        recieved_data = self.request.recv(1024).strip() # recieve data
-        path = self.find_path(recieved_data.decode())   # find host from decoded str
+        recieved_data = self.request.recv(1024).strip()                 # recieve data
+        parsed: {str: str} = pt.parse_request(recieved_data.decode())   # parse decoded input into dict
 
+        path = parsed['path']
         if path == '/hi':
-            self.send_response(
-                """
-                HTTP/1.1 301 Moved Permanently\r\n
-                Location: /hello
-                """
-            )
+            response = http_301('/hello')
+            self.send_response(response)
 
         elif path == '/hello':
-            self.send_response(
-                """
-                HTTP/1.1 200 OK\r\n
-                Content-Length: 12\r\n\r\n
-                Hello world!
-                """
-            )
+            response = http_200('text/plain', 'Hello world!')
+            self.send_response(response)
 
         else:
-            self.send_response(
-                """
-                HTTP/1.1 404 Not Found\r\n
-                Content-Type: text/plain\r\n
-                content-length: 36\r\n\r\n
-                The requested content does not exist
-                """
-            )
-
+            response = http_404('text/plain', 'The requested content does not exist')
+            self.send_response(response)
 
 
 if __name__ == '__main__':
-    HOST, PORT = 'localhost', 8000
-
+    HOST, PORT = '0.0.0.0', 8000
+    print('starting server...')
     with socketserver.ThreadingTCPServer((HOST, PORT), MyTCPHandler) as server:
         server.serve_forever()
 
