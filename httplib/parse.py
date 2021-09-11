@@ -16,7 +16,8 @@ class ParseTools:
         parsed['request_type'] = request_line[0]
         parsed['path'] = request_line[1]
         parsed['http_version'] = request_line[2]  # safely assume is HTTP/1.1
-        if len(content) == 2: parsed['body'] = content[1]
+        if len(content) == 2:
+            parsed['body'] = content[1]
 
         for header in headers:
             pair = header.split(': ')
@@ -40,6 +41,7 @@ class ParseTools:
     @classmethod
     def write_raw(cls, status_code: int, status_message: str, headers,
                   http_version: str = 'HTTP/1.1', body: bytes = None) -> bytes:
+        print([status_code, status_message])
         response: bytes = f'{http_version} {status_code} {status_message}\r\n'.encode()
         for (key, value) in headers.items():
             response += f'{key}: {str(value)}\r\n'.encode()

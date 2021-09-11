@@ -11,9 +11,6 @@ def http_200(content_type: str, content: bytes, charset: str = None) -> bytes:
       'X-Content-Type-Options': 'nosniff',
     }
 
-    if content_type.split('/')[0] == 'img':
-        headers['Sec-Fetch-Dest'] = 'image'
-
     response = pt.write_raw(
         status_code=200,
         status_message='OK',
