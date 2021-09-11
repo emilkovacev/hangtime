@@ -20,7 +20,7 @@ class MyTCPHandler(socketserver.BaseRequestHandler):
             file = http_200('text/html', read('index.html'), 'utf-8')
             self.send_response(file)
 
-        elif path[0:6] == '/image':
+        elif len(path) > 7 and path[0:6] == '/image':
             file = http_200('img/jpeg', image(f'image/{path[7:]}'))
             self.send_response(file)
 
