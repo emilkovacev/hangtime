@@ -13,7 +13,6 @@ class ParseTools:
         request_line = lines[0].split(' ')
         headers = lines[1:]
 
-        print(request_line)
         parsed['request_type'] = request_line[0]
         parsed['path'] = request_line[1]
         parsed['http_version'] = request_line[2]  # safely assume is HTTP/1.1
@@ -39,8 +38,8 @@ class ParseTools:
         return response.rstrip('\r\n')
 
     @classmethod
-    def write_raw(cls, status_code: int, status_message: str, headers, body: bytes,
-                  http_version: str = 'HTTP/1.1') -> bytes:
+    def write_raw(cls, status_code: int, status_message: str, headers,
+                  http_version: str = 'HTTP/1.1', body: bytes = None) -> bytes:
         response: bytes = f'{http_version} {status_code} {status_message}\r\n'.encode()
         for (key, value) in headers.items():
             response += f'{key}: {str(value)}\r\n'.encode()

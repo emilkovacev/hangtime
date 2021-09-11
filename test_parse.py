@@ -1,5 +1,5 @@
 import unittest
-from http_parse import ParseTools as pt
+from httplib.parse import ParseTools as pt
 
 
 class TestRequest(unittest.TestCase):
@@ -43,8 +43,8 @@ class TestResponse(unittest.TestCase):
         self.assertEqual(expected_output, output)
 
     def test_body(self):
-        expected_output = 'HTTP/1.1 404 Not Found\r\nContent-Type: text/plain\r\nContent-Length: 36\r\n\r\nThe ' \
-                          'requested content does not exist '
+        message = 'The requested content does not exist, Jesse >:('
+        expected_output = 'HTTP/1.1 404 Not Found\r\nContent-Type: text/plain\r\nContent-Length: 36\r\n\r\n' + message
         output = pt.write_response(
             status_code=404,
             status_message='Not Found',
@@ -52,9 +52,27 @@ class TestResponse(unittest.TestCase):
                 'Content-Type': 'text/plain',
                 'Content-Length': 36,
             },
-            body='The requested content does not exist',
+            body=message,
         )
 
+        self.assertEqual(expected_output, output)
+
+    def test_unicode(self):
+        message = '你好！'
+        expected_output = f'HTTP/1.1 200 OK\r\nContent-Type: text/plain; charset=utf-8\r\n' \
+                          f'Content-Length: {len(message.encode())}\r\n' \
+                          f'\r\n{message}'
+        output = pt.write_response(
+            status_code=200,
+            status_message='OK',
+            headers={
+                'Content-Type': 'text/plain; charset=utf-8',
+                'Content-Length': len(message.encode()),
+            },
+            body=message,
+        )
+
+        print(output)
         self.assertEqual(expected_output, output)
 
 

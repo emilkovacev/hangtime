@@ -1,38 +1,40 @@
 from .parse import ParseTools as pt
 
-utf_options = {
-    'text/plain': '',
-    'text/html': 'charset=utf8',
-    'text/css': '',
-    'text/javascript': '',
-    'image/png': '',
-    'image/jpeg': '',
-    'video/mp4': ''
-}
 
+def http_200(content_type: str, content: bytes, charset: str = None) -> bytes:
+    if charset:
+        content_type += f'; charset={charset}'
 
-def http_200(content_type: str, content: bytes) -> bytes:
-    status_code: int = 200
-    status_message: str = 'OK'
     headers = {
-        'Content-Type': f'{content_type}; {utf_options[content_type]}',
-        'Content-Length': str(len(content)),
-        'X-Content-Type-Options': 'nosniff',
+      'Content-Type': content_type,
+      'Content-Length': len(content.strip()),
+      'X-Content-Type-Options': 'nosniff',
     }
-    body = content
 
-    return pt.write_raw(status_code=status_code, status_message=status_message, headers=headers, body=body)
+    if content_type.split('/')[0] == 'img':
+        headers['Sec-Fetch-Dest'] = 'image'
+
+    response = pt.write_raw(
+        status_code=200,
+        status_message='OK',
+        headers=headers,
+        body=content,
+    )
+
+    return response
 
 
 def http_301(path: str) -> bytes:
-    response = pt.write_response(
+    print(path)
+    response = pt.write_raw(
         status_code=301,
         status_message='Moved Permanently',
         headers={
             'Location': path,
+            'Content-Length': 0,
         },
     )
-    return response.encode()
+    return response
 
 
 def http_404(content_type: str, content: bytes) -> bytes:
@@ -41,7 +43,7 @@ def http_404(content_type: str, content: bytes) -> bytes:
         status_message='Not Found',
         headers={
             'Content-Type': content_type,
-            'Content-Length': str(len(content)),
+            'Content-Length': len(content.strip()),
         },
         body=content,
     )
@@ -58,4 +60,5 @@ def read(path: str) -> bytes:
 
 
 def image(path: str) -> bytes:
-    return read(path)
+    with open(path, 'rb') as f:
+        return f.read()
