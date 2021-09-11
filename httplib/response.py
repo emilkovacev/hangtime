@@ -2,14 +2,14 @@ from .parse import ParseTools as pt
 
 
 def http_200(content_type: str, content: bytes, charset: str = None) -> bytes:
-    if charset:
-        content_type += f'; charset={charset}'
-
     headers = {
       'Content-Type': content_type,
       'Content-Length': len(content.strip()),
       'X-Content-Type-Options': 'nosniff',
     }
+
+    if charset:
+        headers['Content-Type'] += f'; charset={charset}'
 
     response = pt.write_raw(
         status_code=200,

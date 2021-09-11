@@ -14,15 +14,20 @@ class MyTCPHandler(socketserver.BaseRequestHandler):
         parsed: {str: str} = pt.parse_request(received_data.decode())  # parse decoded input into dict
         path = parsed['path']
 
-        print(path)
+        slash = [x for x in path.split('/') if x != '']
 
         if path == '/':
             file = http_200('text/html', read('index.html'), 'utf-8')
             self.send_response(file)
 
-        elif len(path) > 7 and path[0:6] == '/image':
-            file = http_200('img/jpeg', image(f'image/{path[7:]}'))
-            self.send_response(file)
+        elif len(slash) == 2 and slash[0] == 'image':
+            filename = slash[1]
+            try:
+                file = http_200(f'img/{filename.split(".")[1]}', image(f'image/{filename}'))
+                self.send_response(file)
+            except FileNotFoundError:
+                response = http_404('text/plain', text('The requested image does not exist, Jesse >:('))
+                self.send_response(response)
 
         elif path == '/style/style.css':
             file = http_200('text/css', read('style/style.css'), 'utf-8')
