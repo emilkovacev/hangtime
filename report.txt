@@ -1,0 +1,25 @@
+The structure of this project is as follows:
+hw1
+|- server.py: The location of the code for the TCP socket server
+|- httplib/: a library (I wrote for this project) to parse and handle default requests
+   |- __init__.py: allows me to import and run functions from python files in this directory
+   |- directory.py [not in use]: a class I wrote to iterate through files in a directory.
+   |                             I was thinking about using them to iterate through images,
+   |                             but I found a better solution
+   |
+   |- parse.py: a library of functions I wrote to parse requests and format responses
+   |- response.py: a series of default responses (200, 301, 404) created using parse.py functions with default parameters
+
+|- index.html: HTML front page
+|- style/: a directory containing all CSS
+   |- style.css: stylesheet for '/'
+
+|- js/: a directory containing all JavaScript
+   |- script.js: js for '/'
+
+|- image/: a directory containing all images on the website
+|- utf.txt: a utf text file
+
+|- test_parse.py: a test suite for parsing requests and formatting responses properly
+|- Dockerfile
+|- .dockerignore: used to ignore hidden (/.) files (to prevent docker from crashing on COPYing .git file)

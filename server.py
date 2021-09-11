@@ -59,4 +59,3 @@ if __name__ == '__main__':
     print('starting server...')
     with socketserver.ThreadingTCPServer((HOST, PORT), MyTCPHandler) as server:
         server.serve_forever()
-        server.allow_reuse_address = True  # python socketserver documentation (allows address reuse when running)
