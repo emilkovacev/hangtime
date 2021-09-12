@@ -23,7 +23,7 @@ class MyTCPHandler(socketserver.BaseRequestHandler):
         elif len(slash) == 2 and slash[0] == 'image':
             filename = slash[1]
             try:
-                file = http_200(f'img/{filename.split(".")[1]}', image(f'image/{filename}'))
+                file = http_200(f'image/{filename.split(".")[1]}', image(f'image/{filename}'))
                 self.send_response(file)
             except FileNotFoundError:
                 response = http_404('text/plain', text('The requested image does not exist, Jesse >:('))
