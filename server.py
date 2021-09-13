@@ -26,8 +26,8 @@ class MyTCPHandler(socketserver.BaseRequestHandler):
                 file = http_200(f'image/{filename.split(".")[1]}', image(f'image/{filename}'))
                 self.send_response(file)
             except FileNotFoundError:
-                response = http_404('text/plain', text('The requested image does not exist, Jesse >:('))
-                self.send_response(response)
+                file = http_404('text/html', read('httplib/error_templates/404.html'))
+                self.send_response(file)
 
         elif path == '/style/style.css':
             file = http_200('text/css', read('style/style.css'), 'utf-8')
@@ -50,8 +50,8 @@ class MyTCPHandler(socketserver.BaseRequestHandler):
             self.send_response(response)
 
         else:
-            response = http_404('text/plain', text('The requested content does not exist, Jesse >:('))
-            self.send_response(response)
+            file = http_404('text/html', read('httplib/error_templates/404.html'))
+            self.send_response(file)
 
 
 if __name__ == '__main__':
