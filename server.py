@@ -1,5 +1,5 @@
 import socketserver
-from httplib.response import *  # I made my own http library :)
+import re
 
 
 class MyTCPHandler(socketserver.BaseRequestHandler):
@@ -14,19 +14,25 @@ class MyTCPHandler(socketserver.BaseRequestHandler):
         parsed: {str: str} = pt.parse_request(received_data.decode())  # parse decoded input into dict
         path = parsed['path']
 
-        slash = [x for x in path.split('/') if x != '']
+        header = re.match("^/[^?/]+", path)
+        query = re.compile("(?<=[?]).+$")
+        file = re.compile("[^/]+.$")
+        ext = re.compile("(?<=[.]).+$")
 
-        if path == '/':
+        if header.group() == '/':
             file = http_200('text/html', read('index.html'), 'utf-8')
             self.send_response(file)
 
-        elif len(slash) == 2 and slash[0] == 'image':
-            filename = slash[1]
+        elif header.group() == '/images':
+            q = query.match(path)
+            filename = file.match(path)
+            file_ext = ext.match(path)
+
             try:
-                file = http_200(f'image/{filename.split(".")[1]}', image(f'image/{filename}'))
+                file = http_200(f'image/{file_ext.string}', image(f'image/{filename}'))
                 self.send_response(file)
             except FileNotFoundError:
-                file = http_404('text/html', read('httplib/error_templates/404.html'))
+                file = http_404('text/html', read('crablib/error_templates/404.html'))
                 self.send_response(file)
 
         elif path == '/style/style.css':
@@ -50,7 +56,7 @@ class MyTCPHandler(socketserver.BaseRequestHandler):
             self.send_response(response)
 
         else:
-            file = http_404('text/html', read('httplib/error_templates/404.html'))
+            file = http_404('text/html', read('crablib/error_templates/404.html'))
             self.send_response(file)
 
 

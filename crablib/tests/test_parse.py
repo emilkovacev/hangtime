@@ -1,5 +1,5 @@
 import unittest
-from httplib.parse import ParseTools as pt
+from crablib.http.parse import ParseTools as pt
 
 
 class TestRequest(unittest.TestCase):
