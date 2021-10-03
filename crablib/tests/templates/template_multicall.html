@@ -2,5 +2,11 @@
 <html>
     <body>
         <h1>{{ heading }} {{ subtitle }}</h1>
+        {% for i in names %}
+            <i>repeat me!</i>
+            {{ i }}
+            <p>repeat me!</p>
+        {% endfor %}
+        <img src="{{ hi }}"/>
     </body>
 </html>
