@@ -14,10 +14,24 @@ class TestHTMLGen(unittest.TestCase):
         test = f"""<!DOCTYPE html>
 <html>
     <body>
-        <h1>{args["heading"]}</h1>
-        <img src="google.jpg"/>
+        <h1>12 True</h1>
+                    <i>repeat me!</i>
+            patrick
+            <p>repeat me!</p>
+                    <i>repeat me!</i>
+            anthony
+            <p>repeat me!</p>
+                    <i>repeat me!</i>
+            adam
+            <p>repeat me!</p>
+                    <i>repeat me!</i>
+            rosina
+            <p>repeat me!</p>
+        
+        <img src="Hello!"/>
     </body>
-</html>"""
+</html>
+"""
         self.assertEqual(html, test)
 
 

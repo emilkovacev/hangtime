@@ -1,0 +1,15 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <link rel="stylesheet" href="/style/style.css">
+    </head>
+
+    <body>
+        <div>
+            {{ name }}
+            {% for url in images %}
+                <img src="{{ url }}"/>
+            {% endfor %}
+        </div>
+    </body>
+</html>
