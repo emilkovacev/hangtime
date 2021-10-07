@@ -1,4 +1,5 @@
 from .parse import ParseTools as pt
+from crablib.htmlgen.generate import generate_html
 
 
 def http_200(content_type: str, content: bytes, charset: str = None) -> bytes:
@@ -54,6 +55,11 @@ def text(txt_input: str):
 def read(path: str) -> bytes:
     with open(path, 'r', errors='strict', buffering=1) as f:
         return f.read().encode()
+
+
+def html(path: str, arguments=None) -> bytes:
+    with open(path, 'r', errors='strict', buffering=1) as f:
+        return generate_html(f.read(), arguments).encode()
 
 
 def image(path: str) -> bytes:

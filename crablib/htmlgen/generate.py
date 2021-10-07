@@ -43,13 +43,12 @@ def generate_html(path: str, arguments: {str: any}) -> str:
 
         return retval
 
-    retval = ''
+    html_return = ''
     with open(path, 'r') as f:
         file = f.read()
         html = re.sub(find_loops, handle_loop, file)
         for line in html.split('\n'):
             if not comment.search(line):
-                retval += re.sub(replace, replace_str, line) + '\n'
+                html_return += (re.sub(replace, replace_str, line)).strip(' ')
 
-    return retval
-
+    return html_return.rstrip('\n')

@@ -1,3 +1,13 @@
+import re
+
+
+class Request:
+    def __init__(self, request_type, path, http_version, body=None):
+        self.request_type: str = request_type
+        self.path: str = path
+        self.http_version: str = http_version
+        self.body: str = body
+
 class ParseTools:
     """
     Parse HTTP str input
@@ -20,7 +30,7 @@ class ParseTools:
             parsed['body'] = content[1]
 
         for header in headers:
-            pair = header.split(': ')
+            pair = re.split('\\w+:\\s*\\w+', header)
             parsed[pair[0]] = pair[1]
 
         return parsed

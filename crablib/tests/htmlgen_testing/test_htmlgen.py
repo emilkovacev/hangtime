@@ -10,7 +10,7 @@ class TestHTMLGen(unittest.TestCase):
             'heading': 12,
             'subtitle': True
         }
-        html = generate_html('templates/template_multicall.html', args)
+        html = generate_html('../templates/template_multicall.html', args)
         test = f"""<!DOCTYPE html>
 <html>
     <body>
