@@ -1,8 +1,8 @@
-from .parse import ParseTools as pt
+from .parse import Response
 from crablib.htmlgen.generate import generate_html
 
 
-def http_200(content_type: str, content: bytes, charset: str = None) -> bytes:
+def http_200(content_type: str, content: bytes, charset: str = None) -> Response:
     headers = {
       'Content-Type': content_type,
       'Content-Length': len(content.strip()),
@@ -12,7 +12,7 @@ def http_200(content_type: str, content: bytes, charset: str = None) -> bytes:
     if charset:
         headers['Content-Type'] += f'; charset={charset}'
 
-    response = pt.write_raw(
+    response = Response(
         status_code=200,
         status_message='OK',
         headers=headers,
@@ -22,9 +22,8 @@ def http_200(content_type: str, content: bytes, charset: str = None) -> bytes:
     return response
 
 
-def http_301(path: str) -> bytes:
-    print(path)
-    response = pt.write_raw(
+def http_301(path: str) -> Response:
+    response = Response(
         status_code=301,
         status_message='Moved Permanently',
         headers={
@@ -35,8 +34,8 @@ def http_301(path: str) -> bytes:
     return response
 
 
-def http_404(content_type: str, content: bytes) -> bytes:
-    response = pt.write_raw(
+def http_404(content_type: str, content: bytes) -> Response:
+    response = Response(
         status_code=404,
         status_message='Not Found',
         headers={
@@ -46,22 +45,3 @@ def http_404(content_type: str, content: bytes) -> bytes:
         body=content,
     )
     return response
-
-
-def text(txt_input: str):
-    return txt_input.encode()
-
-
-def read(path: str) -> bytes:
-    with open(path, 'r', errors='strict', buffering=1) as f:
-        return f.read().encode()
-
-
-def html(path: str, arguments=None) -> bytes:
-    with open(path, 'r', errors='strict', buffering=1) as f:
-        return generate_html(f.read(), arguments).encode()
-
-
-def image(path: str) -> bytes:
-    with open(path, 'rb') as f:
-        return f.read()

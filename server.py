@@ -1,81 +1,99 @@
+import re
 import socketserver
-import sys
 
-from crablib.http.response import *
-from crablib.querygen.reader import *
+from crablib.http.parse import Request, parse_request, FileIO
+from crablib.http.response import http_200, http_301, http_404
+from crablib.querygen.reader import read_query
+
+from urls import urls, Path
 
 
 class CrabServer(socketserver.BaseRequestHandler):
-    def send_response(self, response):
+    def send_response(self, response: bytes):
         self.request.sendall(response)
-
-    def route(self, func, regex):
-        if re.match(regex, self.request.recv(1024)):
-            self.request.sendall(func())
+        return
 
     def handle(self):
-        received_data = self.request.recv(1024)  # receive data
-        if len(received_data) == 0:
-            return
+        request: str = self.request.recv(1024).decode()
+        print(repr(request))
+        data: Request = parse_request(request)
 
-        parsed: {str: str} = pt.parse_request(received_data.decode())  # parse decoded input into dict
-        path = parsed['path']
+        response_404 = http_404(
+            content_type='text/html',
+            content=FileIO('crablib/error_templates/404.html').read()
+        )
 
-        print(path)
+        item: Path
+        for item in urls:
+            match = re.match(item.regex, data.path)
+            if match and item.path:
+                try:
+                    self.send_response(http_200(
+                        content_type=item.mimetype,
+                        content=FileIO(item.path).read()
+                    ).write_raw())
+                    return
+                except FileNotFoundError:
+                    self.send_response(response_404.write_raw())
 
-        if re.match('^/$', path):
-            file = http_200('text/html', read('html/index.html'), 'utf-8')
-            self.send_response(file)
+            elif match:
+                try:
+                    self.send_response(http_200(
+                        content_type=item.mimetype,
+                        content=FileIO(match.group(1)).read()
+                    ).write_raw())
+                    return
+                except FileNotFoundError:
+                    self.send_response(response_404.write_raw())
+        self.send_response(response_404.write_raw())
+        return
 
-        elif re.match('^/images/[^.]+\\.\\w+$', path):
-            pass
-
-        elif re.match('^/images/(?P<title>[^. ]+)\\.(?P<file>(png|jpg|jpeg))+$', path):
-            filename = re.match("[^/]+.$", path)
-            file_ext = re.match("(?<=[.]).+$", path)
-
-            try:
-                file = http_200(f'image/{file_ext.string}', image(f'image/{filename}'))
-                self.send_response(file)
-            except FileNotFoundError:
-                file = http_404('text/html', read('crablib/error_templates/404.html'))
-                self.send_response(file)
-        elif re.match('^/images?.+', path):
-            arguments = read_query(path)
-            try:
-                file = http_200(f'text/html', html('html/index.html', arguments))
-                self.send_response(file)
-            except FileNotFoundError:
-                file = http_404('text/html', read('crablib/error_templates/404.html'))
-                self.send_response(file)
-
-        elif re.match('^/style/style.css$', path):
-            file = http_200('text/css', read('style/style.css'), 'utf-8')
-            self.send_response(file)
-
-        elif re.match('^/js.script.js$', path):
-            file = http_200('text/javascript', read('js/script.js'), 'utf-8')
-            self.send_response(file)
-
-        elif re.match('^/utf.txt$', path):
-            file = http_200('text/html', read('utf.txt'), 'utf-8')
-            self.send_response(file)
-
-        elif re.match('^/hello$', path):
-            response = http_200('text/plain', text('Hello world!'))
-            self.send_response(response)
-
-        elif re.match('^/hi$', path):
-            response = http_301('/hello')
-            self.send_response(response)
-
-        else:
-            file = http_404('text/html', read('crablib/error_templates/404.html'))
-            self.send_response(file)
-
-
-if __name__ == '__main__':
-    HOST, PORT = '0.0.0.0', int(sys.argv[1])
-    print(f'starting server for {HOST} at {PORT}')
-    with socketserver.ThreadingTCPServer((HOST, PORT), CrabServer) as server:
-        server.serve_forever()
+        # if re.match('^/$', path):
+        #     file = http_200('text/html', FileIO('html/index.html').read(), 'utf-8').write_raw()
+        #     self.send_response(file)
+        #
+        # elif re.match('^/images/[^.]+\\.\\w+$', path):
+        #     pass
+        #
+        # elif re.match('^/images/(?P<title>[^. ]+)\\.(?P<file>(png|jpg|jpeg))+$', path):
+        #     filename = re.match("[^/]+.$", path)
+        #     file_ext = re.match("(?<=[.]).+$", path)
+        #
+        #     try:
+        #         file = http_200(f'image/{file_ext.string}', image(f'image/{filename}'))
+        #         self.send_response(file)
+        #     except FileNotFoundError:
+        #         file = http_404('text/html', read('crablib/error_templates/404.html'))
+        #         self.send_response(file)
+        # elif re.match('^/images?.+', path):
+        #     arguments = read_query(path)
+        #     try:
+        #         file = http_200(f'text/html', html('html/index.html', arguments))
+        #         self.send_response(file)
+        #     except FileNotFoundError:
+        #         file = http_404('text/html', read('crablib/error_templates/404.html'))
+        #         self.send_response(file)
+        #
+        # elif re.match('^/style/style.css$', path):
+        #     file = http_200('text/css', read('style/style.css'), 'utf-8')
+        #     self.send_response(file)
+        #
+        # elif re.match('^/script.script.script$', path):
+        #     file = http_200('text/javascript', read('script/script.script'), 'utf-8')
+        #     self.send_response(file)
+        #
+        # elif re.match('^/utf.txt$', path):
+        #     file = http_200('text/html', read('utf.txt'), 'utf-8')
+        #     self.send_response(file)
+        #
+        # elif re.match('^/hello$', path):
+        #     response = http_200('text/plain', text('Hello world!'))
+        #     self.send_response(response)
+        #
+        # elif re.match('^/hi$', path):
+        #     response = http_301('/hello')
+        #     self.send_response(response)
+        #
+        # else:
+        #     file = http_404('text/html', read('crablib/error_templates/404.html'))
+        #     self.send_response(file)
