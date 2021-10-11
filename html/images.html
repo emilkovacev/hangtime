@@ -6,9 +6,9 @@
 
     <body>
         <div>
-            {{ name }}
+            <h1>Hi {{ name }}!</h1>
             {% for url in images %}
-                <img src="{{ url }}"/>
+                <img class="img" src="{{ url }}"/>
             {% endfor %}
         </div>
     </body>

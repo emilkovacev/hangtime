@@ -14,3 +14,7 @@ body {
 .desc {
     font-size: 2rem;
 }
+
+img {
+    max-height: 200px;
+}
