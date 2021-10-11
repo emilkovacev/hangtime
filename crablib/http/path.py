@@ -1,13 +1,10 @@
-from crablib.http.parse import FileIO
+from typing import Callable
+
+from crablib.http.parse import FileIO, Request
 from crablib.querygen.reader import read_query
 
 
 class Path:
-    def __init__(self, regex: str, mimetype: str, path: str = None):
+    def __init__(self, regex: str, view: Callable[[Request], bytes]):
         self.regex = regex
-        self.mimetype = mimetype
-        self.path = path
-
-    def retval(self) -> bytes:
-        if self.path:
-            return FileIO(self.path, read_query(self.path)).read()
+        self.view = view

@@ -1,9 +1,13 @@
 from crablib.http.path import Path
+import views
+
 
 urls = [
-    Path('^/$', 'text/html', path='html/index.html'),
-    Path('^\\/(images\\/[^.]+\\.(jpg|jpeg))$', 'image/jpeg'),
-    Path('^\\/(style\\/[^.]+\\.css)$', 'text/css'),
-    Path('^\\/(script\\/[^.]+\\.js)$', 'text/javascript'),
-    Path('^/(images\\?[^?]+)$', 'text/html', path='html/images.html'),
+    Path('^/$', views.index),
+    Path('^/yoshi$', views.yoshi),
+    Path('^\\/(images\\/[^.]+\\.(jpg|jpeg))$', views.img),
+    Path('^\\/(style\\/[^.]+\\.css)$', views.css),
+    Path('^\\/(script\\/[^.]+\\.js)$', views.js),
+    Path('^/(images\\?[^?]+)$', views.images),
+    Path('^/comment$', views.form),
 ]

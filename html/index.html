@@ -7,8 +7,20 @@
     <body>
         <div class="background">
             <h1 id="header">Hello! You have entered the Big Yoshi Domain</h1>
-            <p class="desc">Resize the page to continue</p>
         </div>
-        <script src="/script/script.js"></script>
+
+        <form action="/comment" id="comment-form" method="post" enctype="multipart/form-data">
+           <label for="text-form-name">Name: </label>
+           <input id="text-form-name" type="text" name="name"><br/>
+           <label for="form-comment">Comment: </label>
+           <input id="form-comment" type="text" name="comment">
+           <input type="submit" value="Submit">
+        </form>
+
+        <div>
+            {% for message in messages %}
+
+            {% endfor %}
+        </div>
     </body>
 </html>
