@@ -1,4 +1,5 @@
 from crablib.http.parse import FileIO
+from crablib.querygen.reader import read_query
 
 
 class Path:
@@ -9,4 +10,4 @@ class Path:
 
     def retval(self) -> bytes:
         if self.path:
-            return FileIO(self.path).read()
+            return FileIO(self.path, read_query(self.path)).read()

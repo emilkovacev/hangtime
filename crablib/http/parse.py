@@ -1,5 +1,6 @@
 import re
-from crablib.htmlgen.generate import generate_html
+from crablib.htmlgen.newgen import generate_html
+from crablib.querygen.reader import read_query
 
 
 class Request:
@@ -67,9 +68,9 @@ class Response:
 
 
 class FileIO:
-    def __init__(self, path, arguments=None):
+    def __init__(self, path, query=None):
         self.path = path
-        self.arguments = arguments
+        self.query = query
         self.extension = self.find_extension()
 
     def find_extension(self) -> str:
@@ -81,8 +82,9 @@ class FileIO:
 
     def read(self) -> bytes:
         ext = self.extension
-        if ext == 'html' and self.arguments:
-            return generate_html(self.path, self.arguments).encode()
+        if ext == 'html' and self.query and self.query.isvalid():
+            with open(self.path, 'r') as f:
+                return generate_html(f.read(), self.query).encode()
 
         else:
             with open(self.path, 'rb') as f:

@@ -26,7 +26,7 @@ class CrabServer(socketserver.BaseRequestHandler):
         item: Path
         for item in urls:
             match = re.match(item.regex, data.path)
-            query: Query = read_query(data.path)
+            query: Query = read_query(data.path).images()
 
             if match and item.path:
                 try:
