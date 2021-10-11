@@ -79,21 +79,9 @@ class FileIO:
         else:
             return ''
 
-    # def mimetype(self) -> str:
-    #     mimetypes = {
-    #         'txt': 'text/plain',
-    #         'html': 'text/html',
-    #         'css': 'text/css',
-    #         'script': 'text/script',
-    #         'jpg': 'image/jpeg',
-    #         'jpeg': 'image/jpeg',
-    #         'png': 'image/png',
-    #     }
-    #     return mimetypes.get(self.extension, mimetypes[0])  # return text/plain if MIME cannot be guessed
-
     def read(self) -> bytes:
         ext = self.extension
-        if ext == 'html':
+        if ext == 'html' and self.arguments:
             return generate_html(self.path, self.arguments).encode()
 
         else:

@@ -2,13 +2,19 @@ import re
 from crablib.texthandler.html_escape import parse_text
 
 
-def read_query(query: str) -> {str: str}:
+class Query:
+    def __init__(self, query: str, arguments: {str: str}):
+        self.query = query
+        self.arguments = arguments
+
+
+def read_query(query: str) -> Query:
     retval = {}
     arguments = re.compile("(?<=\\?).+")
     search = arguments.search(query)
 
     if not search:
-        return None
+        return Query(query, None)
 
     for arg in search.group(0).split('&'):
         arg = arg.split('=')
@@ -17,4 +23,4 @@ def read_query(query: str) -> {str: str}:
         else:
             retval[arg[0]] = parse_text(arg[1])
 
-    return retval
+    return Query(query, retval)

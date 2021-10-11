@@ -3,7 +3,7 @@ import socketserver
 
 from crablib.http.parse import Request, parse_request, FileIO
 from crablib.http.response import http_200, http_301, http_404
-from crablib.querygen.reader import read_query
+from crablib.querygen.reader import read_query, Query
 
 from urls import urls, Path
 
@@ -26,11 +26,13 @@ class CrabServer(socketserver.BaseRequestHandler):
         item: Path
         for item in urls:
             match = re.match(item.regex, data.path)
+            query: Query = read_query(data.path)
+
             if match and item.path:
                 try:
                     self.send_response(http_200(
                         content_type=item.mimetype,
-                        content=FileIO(item.path).read()
+                        content=FileIO(item.path, query).read()
                     ).write_raw())
                     return
                 except FileNotFoundError:
@@ -40,7 +42,7 @@ class CrabServer(socketserver.BaseRequestHandler):
                 try:
                     self.send_response(http_200(
                         content_type=item.mimetype,
-                        content=FileIO(match.group(1)).read()
+                        content=FileIO(match.group(1), query.arguments).read()
                     ).write_raw())
                     return
                 except FileNotFoundError:

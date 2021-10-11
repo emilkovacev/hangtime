@@ -6,7 +6,7 @@ from crablib.htmlgen.generate import generate_html
 class TestRequest(unittest.TestCase):
 
     def test_image(self):
-        path = '../../../images/big-yoshi.jpeg'
+        path = '../../../images/big-yoshi.jpg'
 
         fileA = FileIO(path).read()
         fileB: bytes

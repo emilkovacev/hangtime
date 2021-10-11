@@ -5,4 +5,5 @@ urls = [
     Path('^\\/(images\\/[^.]+\\.(jpg|jpeg))$', 'image/jpeg'),
     Path('^\\/(style\\/[^.]+\\.css)$', 'text/css'),
     Path('^\\/(script\\/[^.]+\\.js)$', 'text/javascript'),
+    Path('^/(images\\?[^?]+)$', 'text/html', path='html/images.html'),
 ]

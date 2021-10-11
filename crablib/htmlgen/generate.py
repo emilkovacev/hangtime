@@ -1,5 +1,7 @@
 import re
 
+from crablib.querygen.reader import Query
+
 
 class ArgNotFoundError(Exception):
     """
@@ -12,7 +14,8 @@ class ArgNotFoundError(Exception):
         return '{{ ' + str(self.value) + ' }} not defined in arguments'
 
 
-def generate_html(path: str, arguments: {str: any}) -> str:
+def generate_html(path: str, query: Query) -> str:
+    arguments = query.arguments
     replace = re.compile("({{)[^(}})]+(}})")
     instance = re.compile("(?<=({{)).+(?=(}}))")
     comment = re.compile("^(<!--)[^-]*(-->)")
@@ -28,11 +31,11 @@ def generate_html(path: str, arguments: {str: any}) -> str:
             raise ArgNotFoundError(value)
         return str(arguments[value])
 
-    def handle_loop(s):
+    def handle_loop(s: re.Match) -> str:
         retval = ''
-        var = s.group(1)
-        arg = s.group(2)
-        content = s.group(3)
+        var: str = s.group(1)
+        arg: str = s.group(2)
+        content: str = s.group(3)
 
         if arg not in arguments:
             raise ArgNotFoundError(arg)
