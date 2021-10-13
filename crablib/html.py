@@ -2,7 +2,7 @@ import re
 from typing import Dict, List
 
 loops = re.compile('{%\\s*(?P<exp>\\w+)\\s(?P<var>\\w+)\\sin\\s(?P<arg>\\w+)\\s*%}[\n]*'
-                   '(?P<content>.+?)[\n\\s]*{%\\s*endfor\\s*%}')
+                   '(?P<content>.*?)[\n\\s]*{%\\s*endfor\\s*%}')
 
 variables = re.compile('{{\\s*(?P<var>\\w+)\\s*}}')
 
