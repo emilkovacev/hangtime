@@ -1,5 +1,5 @@
 import re
-from typing import Dict
+from typing import Dict, List, Tuple
 
 
 class Request:
@@ -92,3 +92,22 @@ def escape(html: str) -> str:
         .replace('<', '&#60;') \
         .replace('>', '&#62;') \
         .replace('=', '&#61')
+
+
+def parse_form(request: Request) -> Dict[str, bytes]:
+    boundary: str = '--' + re.search('boundary=(?P<boundary>.+);?', request.headers['Content-Type']).group(1)
+    bytesearch = boundary.encode() + b'\r\n(?P<headers>.+)\r\n\r\n(?P<content>.+)\r\n'
+    content_chunks: List[re.Match] = re.findall(bytesearch, request.body)
+
+    retval: Dict[str, bytes] = {}
+    content: Tuple[bytes]
+    for content in content_chunks:
+        headers: List[str] = content[0].decode().split('\r\n')
+        headers_dict: Dict[str, Header] = {}
+        for header in headers:
+            headerobj: Header = parse_header(header)
+            print(headerobj.name)
+            headers_dict[headerobj.name] = headerobj
+        content_name: str = headers_dict['Content-Disposition'].options['name']
+        retval[content_name] = content[1]
+    return retval

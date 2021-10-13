@@ -9,5 +9,6 @@ urls = [
     Path('^\\/(style\\/[^.]+\\.css)$', views.css),
     Path('^\\/(script\\/[^.]+\\.js)$', views.js),
     Path('^/(images\\?[^?]+)$', views.images),
-    Path('^/comment$', views.form),
+    Path('^/comment$', views.form_upload),
+    Path('^/image-upload$', views.image_upload)
 ]

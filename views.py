@@ -1,17 +1,18 @@
 import re
-from typing import List, Dict, Iterator, Tuple
+from typing import List, Dict, Tuple
 
 from crablib.http.response import http_200, http_301
-from crablib.http.parse import Request, parse_header, Header, escape
+from crablib.http.parse import Request, escape, parse_form
 from crablib.fileIO import FileIO
 
 
 # text/html
-data: List[str] = []
+messages: List[str] = []
+image_urls: List[str] = []
 def index(request: Request) -> bytes:
     return http_200(
         content_type='text/html',
-        content=FileIO('html/index.html').read({'messages': data})
+        content=FileIO('html/index.html').read({'messages': messages, 'images': image_urls})
     ).write_raw()
 
 
@@ -71,25 +72,17 @@ def img(request: Request) -> bytes:
 
 
 # forms
-def form(request: Request) -> bytes:
+def form_upload(request: Request) -> bytes:
+    form: Dict[str, bytes] = parse_form(request)
+    for field in form:
+        messages.append(escape(f'{field}: {form[field].decode()}'))
 
-    boundary: str = '--' + re.search('boundary=(?P<boundary>.+);?', request.headers['Content-Type']).group(1)
-    bytesearch = boundary.encode() + b'\r\n(?P<headers>.+)\r\n\r\n(?P<content>.+)\r\n'
-    content_chunks: List[re.Match] = re.findall(bytesearch, request.body)
-
-    retval: Dict[str, bytes] = {}
-    content: Tuple[bytes]
-    for content in content_chunks:
-        headers: List[str] = content[0].decode().split('\r\n')
-        headers_dict: Dict[str, Header] = {}
-        for header in headers:
-            headerobj: Header = parse_header(header)
-            print(headerobj.name)
-            headers_dict[headerobj.name] = headerobj
-        content_name: str = headers_dict['Content-Disposition'].options['name']
-        retval[content_name] = content[1]
-        data.append(escape(f'{content_name}: {content[1].decode()}'))
-
-    print(data)
     response: bytes = http_301('/').write_raw()
     return response
+
+
+def image_upload(request: Request) -> bytes:
+    form: Dict[str, bytes] = parse_form(request)
+
+    for image in form['']
+    return b''

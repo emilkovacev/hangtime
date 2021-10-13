@@ -9,17 +9,34 @@
             <h1 id="header">Hello! You have entered the Big Yoshi Domain</h1>
         </div>
 
+        <h1>Favorite Yoshi Discussion Forum (FYDF)</h1>
         <form action="/comment" id="comment-form" method="post" enctype="multipart/form-data">
            <label for="text-form-name">Name: </label>
            <input id="text-form-name" type="text" name="name"><br/>
-           <label for="form-comment">Comment: </label>
-           <input id="form-comment" type="text" name="comment">
+           <label for="form-comment">Favorite Yoshi: </label>
+           <input id="form-comment" type="text" name="yoshi">
            <input type="submit" value="Submit">
         </form>
 
         <div>
             {% for message in messages %}
                 <p>{{ message }}</p>
+            {% endfor %}
+        </div>
+
+        <h1>Favorite Yoshi Image Library (FYIF)</h1>
+        <form action="/image-upload" id="image-form" method="post" enctype="multipart/form-data">
+           <label for="form-file">Yoshi Image: </label>
+           <input id="form-file" type="file" name="upload">
+           <br/>
+           <label for="image-form-name">Caption: </label>
+           <input id="image-form-name" type="text" name="name">
+           <input type="submit" value="Submit">
+        </form>
+
+        <div>
+            {% for url in images %}
+                <img src="images/{{ image }}" />
             {% endfor %}
         </div>
     </body>
