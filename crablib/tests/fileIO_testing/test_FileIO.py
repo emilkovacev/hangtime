@@ -1,5 +1,5 @@
 import unittest
-from crablib.http.parse import FileIO
+from crablib.http.parse.parse import FileIO
 from crablib.htmlgen.generate import generate_html
 
 

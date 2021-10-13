@@ -6,7 +6,10 @@ class Query:
     def __init__(self, query: str, arguments: {str: str}, single=None):
         self.query = query
         self.arguments: {str: str} = arguments
-        self.single = single
+        if single:
+            self.single = single
+        else:
+            self.single = set()
 
     def images(self):
         if self.arguments and 'images' in self.arguments:

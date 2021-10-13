@@ -1,5 +1,4 @@
-from .parse import Response
-from crablib.htmlgen.generate import generate_html
+from crablib.http.parse.parse import Response
 
 
 def http_200(content_type: str, content: bytes, charset: str = None) -> Response:

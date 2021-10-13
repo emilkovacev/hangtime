@@ -1,3 +1,5 @@
+import json
+
 from crablib.http.parse import Request, FileIO
 from crablib.http.response import http_200
 from crablib.querygen.reader import Query, read_query
@@ -58,6 +60,16 @@ def img(request: Request) -> bytes:
 
 # forms
 
+data: [{str: str}] = []
+
+
 def form(request: Request) -> bytes:
-    # parse form data, add to file as json
-    return b''
+    data.append(request.parse_form())
+    print(request.parse_form())
+    print(data)
+    arglist = Query(query='', arguments={'messages': [f'{x[0]}: {x[1]}' for x in data]})
+
+    return http_200(
+        content_type='text/html',
+        content=FileIO('html/index.html', arglist).read()
+    ).write_raw()

@@ -1,7 +1,6 @@
 from typing import Callable
 
-from crablib.http.parse import FileIO, Request
-from crablib.querygen.reader import read_query
+from crablib.http.parse.parse import Request
 
 
 class Path:

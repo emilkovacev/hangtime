@@ -13,7 +13,7 @@ class CrabServer(socketserver.BaseRequestHandler):
         return
 
     def handle(self):
-        request: Request = parse_request(self.request.recv(1024).decode())
+        request: Request = parse_request(self.request.recv(1024))
 
         response_404 = http_404(
             content_type='text/html',
@@ -27,7 +27,6 @@ class CrabServer(socketserver.BaseRequestHandler):
             if match:
                 try:
                     self.send_response(item.view(request))
-                    return
                 except FileNotFoundError:
                     self.send_response(response_404.write_raw())
 
