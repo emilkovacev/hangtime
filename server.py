@@ -1,7 +1,9 @@
+import random
 import re
 import socketserver
 
-from crablib.http.parse import Request, parse_request, FileIO
+from crablib.fileIO import FileIO
+from crablib.http.parse import Request, parse_request
 from crablib.http.response import http_404
 
 from urls import urls, Path
@@ -17,7 +19,7 @@ class CrabServer(socketserver.BaseRequestHandler):
 
         response_404 = http_404(
             content_type='text/html',
-            content=FileIO('crablib/error_templates/404.html').read()
+            content=FileIO('html/404.html').read()
         )
 
         item: Path
@@ -29,6 +31,12 @@ class CrabServer(socketserver.BaseRequestHandler):
                     self.send_response(item.view(request))
                 except FileNotFoundError:
                     self.send_response(response_404.write_raw())
-
         self.send_response(response_404.write_raw())
         return
+
+
+if __name__ == '__main__':
+    HOST, PORT = '0.0.0.0', random.randint(2000, 9000)
+    print(f'starting server for {HOST} at {PORT}')
+    with socketserver.ThreadingTCPServer((HOST, PORT), CrabServer) as server:
+        server.serve_forever()

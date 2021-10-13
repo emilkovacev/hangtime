@@ -1,38 +1,47 @@
-import json
+import re
 
-from crablib.http.parse import Request, FileIO
 from crablib.http.response import http_200
-from crablib.querygen.reader import Query, read_query
+from crablib.http.parse import Request
+from crablib.fileIO import FileIO
 
 
 # text/html
-
 def index(request: Request) -> bytes:
-    query: Query = read_query(request.path).images()
     return http_200(
         content_type='text/html',
-        content=FileIO('html/index.html', query).read()
+        content=FileIO('html/index.html').read()
     ).write_raw()
 
 
 def yoshi(request: Request) -> bytes:
-    query: Query = read_query(request.path).images()
     return http_200(
         content_type='text/html',
-        content=FileIO('html/yoshi.html', query).read()
+        content=FileIO('html/yoshi.html').read()
     ).write_raw()
 
 
 def images(request: Request) -> bytes:
-    query: Query = read_query(request.path).images()
+    retval = {}
+    arguments = re.compile("(?<=\\?).+")
+    search = arguments.search(request.path)
+
+    for arg in search.group(0).split('&'):
+        arg = arg.split('=')
+        if arg[1].count('+') > 0:
+            if arg[0] == 'images':
+                retval[arg[0]] = [f'images/{x}.jpg' for x in arg[1].split('+')]
+            else:
+                retval[arg[0]] = [x for x in arg[1].split('+')]
+        else:
+            retval[arg[0]] = arg[1]
+
     return http_200(
         content_type='text/html',
-        content=FileIO('html/images.html', query).read()
+        content=FileIO('html/images.html').read(retval)
     ).write_raw()
 
 
 # text/css
-
 def css(request: Request) -> bytes:
     return http_200(
         content_type='text/css',
@@ -41,7 +50,6 @@ def css(request: Request) -> bytes:
 
 
 # script/js
-
 def js(request: Request) -> bytes:
     return http_200(
         content_type='text/javascript',
@@ -50,7 +58,6 @@ def js(request: Request) -> bytes:
 
 
 # image/jpg
-
 def img(request: Request) -> bytes:
     return http_200(
         content_type='image/jpeg',
@@ -60,16 +67,9 @@ def img(request: Request) -> bytes:
 
 # forms
 
-data: [{str: str}] = []
-
-
-def form(request: Request) -> bytes:
-    data.append(request.parse_form())
-    print(request.parse_form())
-    print(data)
-    arglist = Query(query='', arguments={'messages': [f'{x[0]}: {x[1]}' for x in data]})
-
-    return http_200(
-        content_type='text/html',
-        content=FileIO('html/index.html', arglist).read()
-    ).write_raw()
+# data: [{str: str}] = []
+# def form(request: Request) -> bytes:
+#     return http_200(
+#         content_type='text/html',
+#         content=FileIO('html/index.html', arglist).read()
+#     ).write_raw()

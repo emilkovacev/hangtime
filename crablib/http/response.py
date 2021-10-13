@@ -1,4 +1,4 @@
-from crablib.http.parse.parse import Response
+from crablib.http.parse import Response
 
 
 def http_200(content_type: str, content: bytes, charset: str = None) -> Response:

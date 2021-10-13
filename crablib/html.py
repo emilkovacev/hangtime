@@ -1,17 +1,16 @@
-from crablib.querygen.reader import Query
 import re
+from typing import Dict, List
 
 loops = re.compile('{%\\s*(?P<exp>\\w+)\\s(?P<var>\\w+)\\sin\\s(?P<arg>\\w+)\\s*%}[\n]*'
                    '(?P<content>.+?)[\n\\s]*{%\\s*endfor\\s*%}')
 
-variables = re.compile('{{\\s+(?P<var>\\w+)\\s+}}')
+variables = re.compile('{{\\s*(?P<var>\\w+)\\s*}}')
 
-
-def generate_html(html: str, query: Query):
+def generate_html(html: str, arguments: Dict[str, str]):
     def replace_var(matchobj: re.Match) -> str:
         var = matchobj.groupdict()['var']
-        if var in query.arguments:
-            return query.arguments[var]
+        if var in arguments:
+            return arguments[var]
         else:
             raise ArgNotFoundError(var)
 
@@ -21,15 +20,15 @@ def generate_html(html: str, query: Query):
         arg = matchobj.groupdict()['arg']
         content = matchobj.groupdict()['content']
 
-        if arg not in query.arguments:
+        if arg not in arguments:
             raise ArgNotFoundError(arg)
 
-        if arg in query.single:
-            query.arguments[var] = query.arguments[arg]
+        if type(arguments[arg]) == str:
+            arguments[var] = arguments[arg]
             retval += variables.sub(replace_var, content) + '\n'
         else:
-            for i in query.arguments[arg]:
-                query.arguments[var] = i
+            for i in arguments[arg]:
+                arguments[var] = i
                 retval += variables.sub(replace_var, content) + '\n'
 
         return retval

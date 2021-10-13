@@ -1,6 +1,6 @@
 from typing import Callable
 
-from crablib.http.parse.parse import Request
+from crablib.http.parse import Request
 
 
 class Path:
