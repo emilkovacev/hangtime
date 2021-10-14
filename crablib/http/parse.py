@@ -96,18 +96,20 @@ def escape(html: str) -> str:
 
 def parse_form(request: Request) -> Dict[str, bytes]:
     boundary: str = '--' + re.search('boundary=(?P<boundary>.+);?', request.headers['Content-Type']).group(1)
-    bytesearch = boundary.encode() + b'\r\n(?P<headers>.+)\r\n\r\n(?P<content>.+)\r\n'
-    content_chunks: List[re.Match] = re.findall(bytesearch, request.body)
+    content_chunks: List[bytes] = request.body.split(boundary.encode())[1:-1]
 
     retval: Dict[str, bytes] = {}
-    content: Tuple[bytes]
+    content: bytes
     for content in content_chunks:
-        headers: List[str] = content[0].decode().split('\r\n')
+        parsed_content: List[bytes] = content.strip(b'\r\n').split(b'\r\n\r\n')
+        headers: List[str] = parsed_content[0].decode().split('\r\n')
+        body: bytes = parsed_content[1]
+
         headers_dict: Dict[str, Header] = {}
+        header: str
         for header in headers:
             headerobj: Header = parse_header(header)
-            print(headerobj.name)
             headers_dict[headerobj.name] = headerobj
-        content_name: str = headers_dict['Content-Disposition'].options['name']
-        retval[content_name] = content[1]
+            content_name: str = headers_dict['Content-Disposition'].options['name']
+            retval[content_name] = body
     return retval

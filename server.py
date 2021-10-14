@@ -15,7 +15,7 @@ class CrabServer(socketserver.BaseRequestHandler):
         return
 
     def handle(self):
-        request: Request = parse_request(self.request.recv(2048))
+        request: Request = parse_request(self.request.recv(1000000000))
 
         response_404 = http_404(
             content_type='text/html',

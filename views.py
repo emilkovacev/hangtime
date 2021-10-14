@@ -5,6 +5,8 @@ from crablib.http.response import http_200, http_301
 from crablib.http.parse import Request, escape, parse_form
 from crablib.fileIO import FileIO
 
+import hashlib
+
 
 # text/html
 messages: List[str] = []
@@ -77,12 +79,15 @@ def form_upload(request: Request) -> bytes:
     for field in form:
         messages.append(escape(f'{field}: {form[field].decode()}'))
 
-    response: bytes = http_301('/').write_raw()
-    return response
+    return http_301('/').write_raw()
 
 
 def image_upload(request: Request) -> bytes:
     form: Dict[str, bytes] = parse_form(request)
-
-    for image in form['']
-    return b''
+    print(form)
+    if '/' not in form['name'].decode():
+        url = f'images/{form["name"].decode()}.jpg'
+        with open(url, 'wb') as f:
+            f.write(form['upload'])
+        image_urls.append(url)
+    return http_301('/').write_raw()
