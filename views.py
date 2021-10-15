@@ -14,14 +14,16 @@ image_urls: List[str] = []
 def index(request: Request) -> bytes:
     return http_200(
         content_type='text/html',
-        content=FileIO('html/index.html').read({'messages': messages, 'images': image_urls})
+        content=FileIO('html/index.html').read({'messages': messages, 'images': image_urls}),
+        charset='utf-8'
     ).write_raw()
 
 
 def yoshi(request: Request) -> bytes:
     return http_200(
         content_type='text/html',
-        content=FileIO('html/yoshi.html').read()
+        content=FileIO('html/yoshi.html').read(),
+        charset='utf-8'
     ).write_raw()
 
 
@@ -53,7 +55,8 @@ def images(request: Request) -> bytes:
 def css(request: Request) -> bytes:
     return http_200(
         content_type='text/css',
-        content=FileIO('style/style.css').read()
+        content=FileIO('style/style.css').read(),
+        charset='utf-8'
     ).write_raw()
 
 
@@ -85,7 +88,7 @@ def form_upload(request: Request) -> bytes:
 def image_upload(request: Request) -> bytes:
     form: Dict[str, bytes] = parse_form(request)
     print(form)
-    if '/' not in form['name'].decode():
+    if 'name' in form and '/' not in form['name'].decode() and f'images/{form["name"].decode()}.jpg' not in image_urls:
         url = f'images/{form["name"].decode()}.jpg'
         with open(url, 'wb') as f:
             f.write(form['upload'])

@@ -15,7 +15,16 @@ class CrabServer(socketserver.BaseRequestHandler):
         return
 
     def handle(self):
-        request: Request = parse_request(self.request.recv(1000000000))
+        request: Request = parse_request(self.request.recv(1024))
+        print(request.headers)
+        if 'Content-Type' in request.headers and request.headers['Content-Type'].split(';')[0] == 'multipart/form-data':
+            content_length: int = len(request.body)
+            length = int(request.headers.get('Content-Length', 0))  # if content-length, add length
+
+            while content_length < length:
+                req = self.request.recv(1024)
+                content_length += len(req)
+                request.body += req
 
         response_404 = http_404(
             content_type='text/html',

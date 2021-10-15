@@ -4,7 +4,7 @@ from typing import Dict, List, Tuple
 
 class Request:
     def __init__(self, request: bytes, request_type: str,
-                 path: str, headers: Dict[str, str], http_version: str = 'HTTP/1.1', body: bytes = None):
+                 path: str, headers: Dict[str, str], http_version: str = 'HTTP/1.1', body: bytes = b''):
         self.request = request
         self.request_type = request_type
         self.path = path
@@ -30,7 +30,7 @@ def parse_request(request: bytes) -> Request:
         parts = re.split(':\\s*', h)
         parsed_headers[parts[0]] = parts[1]
 
-    body = None
+    body: bytes = b''
     if 'Content-Length' in parsed_headers:
         body = request[i + 4: i + 4 + int(parsed_headers['Content-Length'])]
 
@@ -103,7 +103,9 @@ def parse_form(request: Request) -> Dict[str, bytes]:
     for content in content_chunks:
         parsed_content: List[bytes] = content.strip(b'\r\n').split(b'\r\n\r\n')
         headers: List[str] = parsed_content[0].decode().split('\r\n')
-        body: bytes = parsed_content[1]
+        body: bytes = b''
+        if len(parsed_content) == 2:
+            body = parsed_content[1]
 
         headers_dict: Dict[str, Header] = {}
         header: str
