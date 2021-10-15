@@ -1,20 +1,30 @@
 import re
-from typing import List, Dict, Tuple
+import os
+import secrets
+from typing import List, Dict
 
-from crablib.http.response import http_200, http_301
-from crablib.http.parse import Request, escape, parse_form
+from crablib.http.response import http_200, http_301, http_403, http_404
+from crablib.http.parse import Request, escape, parse_form, Response
 from crablib.fileIO import FileIO
 
-import hashlib
 
+message_list: List[str] = []
+image_list: List[str] = []
+xsrf: Dict[str, str] = {}
 
-# text/html
-messages: List[str] = []
-image_urls: List[str] = []
 def index(request: Request) -> bytes:
+    global xsrf
+    xsrf['text'], xsrf['image'] = secrets.token_urlsafe(32), secrets.token_urlsafe(32)
+
     return http_200(
         content_type='text/html',
-        content=FileIO('html/index.html').read({'messages': messages, 'images': image_urls}),
+        content=FileIO('html/index.html').read(
+            {
+                'messages': message_list,
+                'images': image_list,
+                'xsrf_image': xsrf['image'],
+                'xsrf_text': xsrf['text']
+            }),
         charset='utf-8'
     ).write_raw()
 
@@ -79,18 +89,41 @@ def img(request: Request) -> bytes:
 # forms
 def form_upload(request: Request) -> bytes:
     form: Dict[str, bytes] = parse_form(request)
-    for field in form:
-        messages.append(escape(f'{field}: {form[field].decode()}'))
+    if 'xsrf' not in form or form['xsrf'].decode() != xsrf['text']:
+        return http_403(
+            content_type='text/html',
+            content=FileIO('html/403.html').read()
+        ).write_raw()
+
+    author = escape(form["name"].decode())
+    message = escape(form["yoshi"].decode())
+    message_list.append(f'<p><b>{author}</b>: {message}</p>')
 
     return http_301('/').write_raw()
 
 
+def generate_filename():
+    secret = ''
+    while not secret or f'{secret}.jpg' in os.listdir('images'):
+        secret = secrets.token_urlsafe(10)
+    return secret
+
+
 def image_upload(request: Request) -> bytes:
     form: Dict[str, bytes] = parse_form(request)
-    print(form)
-    if 'name' in form and '/' not in form['name'].decode() and f'images/{form["name"].decode()}.jpg' not in image_urls:
-        url = f'images/{form["name"].decode()}.jpg'
+
+    if 'xsrf' not in form or form['xsrf'].decode() != xsrf['image']:
+        return http_403(
+            content_type='text/html',
+            content=FileIO('html/403.html').read()
+        ).write_raw()
+
+    if 'name' in form and '/' not in form['name'].decode() and f'images/{form["name"].decode()}.jpg' not in image_list:
+        filename: str = escape(generate_filename())
+        caption = escape(form["name"].decode())
+        url = f'images/{filename}.jpg'
         with open(url, 'wb') as f:
             f.write(form['upload'])
-        image_urls.append(url)
+        image_list.append(f'<div class="upload"><img src="{escape(url)}" />'
+                          f'<figcaption><i>{caption}</i></figcaption></div>')
     return http_301('/').write_raw()

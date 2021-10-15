@@ -16,7 +16,6 @@ class CrabServer(socketserver.BaseRequestHandler):
 
     def handle(self):
         request: Request = parse_request(self.request.recv(1024))
-        print(request.headers)
         if 'Content-Type' in request.headers and request.headers['Content-Type'].split(';')[0] == 'multipart/form-data':
             content_length: int = len(request.body)
             length = int(request.headers.get('Content-Length', 0))  # if content-length, add length

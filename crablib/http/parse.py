@@ -56,7 +56,7 @@ def parse_header(s: str) -> Header:
     options = {}
     if len(values) >= 3:
         for option in values[2:]:
-            desc = re.match('(?P<opt>.+)="(?P<value>.+)"', option)
+            desc = re.match('(?P<opt>.+)="(?P<value>.*)"', option)
             opt, opt_value = desc.groupdict()['opt'], desc.groupdict()['value']
             options[opt] = opt_value
 

@@ -33,6 +33,18 @@ def http_301(path: str) -> Response:
     return response
 
 
+def http_403(content_type: str, content: bytes) -> Response:
+    response = Response(
+        status_code=403,
+        status_message='Forbidden Response',
+        headers={
+            'Content-Type': content_type,
+            'Content-Length': len(content.strip()),
+        },
+    )
+    return response
+
+
 def http_404(content_type: str, content: bytes) -> Response:
     response = Response(
         status_code=404,

@@ -1,5 +1,6 @@
 import unittest
-from crablib.html import render_obj1
+
+from crablib.html import generate_html
 
 
 class TestRequest(unittest.TestCase):
@@ -25,7 +26,7 @@ class TestRequest(unittest.TestCase):
                    '       </div>\n' \
                    '   </body>\n' \
                    '</html>\n'
-        result = render_obj1(input, 'Emil', ['cat', 'dog', 'rabbit'])
+        result = generate_html(input, {'name': 'Emil', 'images': ['cat', 'dog', 'rabbit']})
         self.assertEqual(expected, result)
 
 
