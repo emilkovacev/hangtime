@@ -10,12 +10,15 @@ body {
 
 .event {
   position: absolute;
-  background-color: #3777FF;
   margin-bottom: 10px;
   font-size: 1.25rem;
   color: white;
   overflow: hidden;
-  min-width: 500px;
+  border-radius: 1rem;
+}
+
+.event:hover {
+  z-index: 20;
 }
 
 .content {
