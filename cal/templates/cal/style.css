@@ -1,0 +1,23 @@
+body {
+  font-family: Helvetica;
+}
+
+#calendar {
+  max-width: 1000px;
+  height: 1440px;
+  background-color: #EEEEEE;
+}
+
+.event {
+  position: absolute;
+  background-color: #3777FF;
+  margin-bottom: 10px;
+  font-size: 1.25rem;
+  color: white;
+  overflow: hidden;
+  min-width: 500px;
+}
+
+.content {
+  padding: 20px;
+}
