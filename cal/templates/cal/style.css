@@ -3,7 +3,7 @@ body {
 }
 
 #calendar {
-  max-width: 1000px;
+  min-width: 1000px;
   height: 1440px;
   background-color: #EEEEEE;
 }
@@ -19,6 +19,7 @@ body {
 
 .event:hover {
   z-index: 20;
+  cursor: pointer;
 }
 
 .content {

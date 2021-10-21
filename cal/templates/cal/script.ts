@@ -30,10 +30,10 @@ function intersections(event: CalendarEvent): number {
   let count = 0;
   for (let i=0; i < events_list.indexOf(event); i++) {
     const cal_event = events_list[i]
-    if (event.start_time <= cal_event.start_time && cal_event.start_time <= event.end_time) {count += 1}
-    else if (event.start_time <= cal_event.start_time && cal_event.start_time <= event.end_time) {count += 1}
-    else if (cal_event.start_time <= event.start_time && event.start_time <= cal_event.end_time) {count += 1}
-    else if (cal_event.start_time <= event.end_time && event.end_time <= cal_event.end_time) {count += 1}
+    if (event.start_time <= cal_event.start_time && cal_event.start_time <= event.end_time) {count += 1;}
+    else if (event.start_time <= cal_event.start_time && cal_event.start_time <= event.end_time) {count += 1;}
+    else if (cal_event.start_time <= event.start_time && event.start_time <= cal_event.end_time) {count += 1;}
+    else if (cal_event.start_time <= event.end_time && event.end_time <= cal_event.end_time) {count += 1;}
   }
   return count;
 }
@@ -56,13 +56,17 @@ function loadEvents(): void {
 
     console.log('start: ' + event.start_time.getHours() + ', end: ' + event.end_time.getHours())
 
-    eventBlock.style.top = (Math.floor(start)).toString() + 'px';
-    eventBlock.style.height = (Math.floor(end-start)).toString() + 'px';
+    eventBlock.style.top = (Math.round(start)).toString() + 'px';
+    eventBlock.style.height = (Math.round(end-start)).toString() + 'px';
     eventBlock.style.backgroundColor = event.color;
-    eventBlock.style.marginLeft = (20*intersections(event)).toString() + 'px';
+    eventBlock.style.marginLeft = (40*intersections(event)).toString() + 'px';
 
     calendar.appendChild(eventBlock);
   }
 }
 
-document.addEventListener('DOMContentLoaded', loadEvents);
+function load() {
+  loadEvents();
+}
+
+document.addEventListener('DOMContentLoaded', load);

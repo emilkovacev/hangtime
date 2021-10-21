@@ -46,11 +46,14 @@ function loadEvents() {
         var start = parseTime(event.start_time);
         var end = parseTime(event.end_time);
         console.log('start: ' + event.start_time.getHours() + ', end: ' + event.end_time.getHours());
-        eventBlock.style.top = (Math.floor(start)).toString() + 'px';
-        eventBlock.style.height = (Math.floor(end - start)).toString() + 'px';
+        eventBlock.style.top = (Math.round(start)).toString() + 'px';
+        eventBlock.style.height = (Math.round(end - start)).toString() + 'px';
         eventBlock.style.backgroundColor = event.color;
-        eventBlock.style.marginLeft = (20 * intersections(event)).toString() + 'px';
+        eventBlock.style.marginLeft = (40 * intersections(event)).toString() + 'px';
         calendar.appendChild(eventBlock);
     }
 }
-document.addEventListener('DOMContentLoaded', loadEvents);
+function load() {
+    loadEvents();
+}
+document.addEventListener('DOMContentLoaded', load);
