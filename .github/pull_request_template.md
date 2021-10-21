@@ -1,5 +1,5 @@
 ## Changes
-*Use `closes` keywork to close the corresponding issue*
+*Use `closes` keyword to close the corresponding issue*
 
 - Description of changes
 
