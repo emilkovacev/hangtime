@@ -8,10 +8,10 @@ assignees: ''
 ---
 
 **Checklist**
-[ ] Titled issue appropriately
-[ ] Assigned issue to myself
-[ ] Labeled issue
-[ ] Placed issue on Kanban Table
+- [ ] Titled issue appropriately
+- [ ] Assigned issue to myself
+- [ ] Labeled issue
+- [ ] Placed issue on Kanban Table
 
 **List what open-source reports this would fall under**
 What open-source reports would we need to write/what do we need to explain to implement this feature?
