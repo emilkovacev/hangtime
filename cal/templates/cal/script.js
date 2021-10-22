@@ -82,7 +82,7 @@ function toggleEventForm() {
     else {
         form.style.display = 'flex';
         calendar.style.display = 'none';
-        new_button.innerHTML = 'X';
+        new_button.innerHTML = '✕';
     }
 }
 document.addEventListener('DOMContentLoaded', load);
