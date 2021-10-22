@@ -4,7 +4,23 @@
 	<link rel="stylesheet" type="text/css" href="style.css"/>
     </head>
     <body>
-        <h1>Calendar</h1>
+        <div class="header">
+            <div id="new">+</div>
+            <h1 class="title">日历</h1>
+        </div>
+        <div id="form">
+            <form action="/">
+                <label for="event-name">Event Name:</label><br>
+                <input type="text" id="event-name" name="event-name" placeholder="Studying for CSE 220"><br>
+                <label for="birthday">Date:</label><br>
+                <input type="date" id="date" name="date"><br>
+                <label for="starttime">Start time:</label><br>
+                <input type="time" id="starttime" name="starttime"><br>
+                <label for="endtime">End time:</label><br>
+                <input type="time" id="endtime" name="endtime"><br>
+                <input type="submit" value="Create" class="submit">
+            </form> 
+        </div>
         <div id="calendar"></div>
 	    <script src="script.js"></script>
     </body>
