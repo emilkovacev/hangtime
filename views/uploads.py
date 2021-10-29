@@ -13,12 +13,19 @@ image_list: List[str] = []
 xsrf: Dict[str, str] = {}
 
 def index(request: Request) -> bytes:
+    return http_200(
+        content_type='text/html',
+        content=FileIO('html/index.html').read(),
+        charset='utf-8'
+    ).write_raw()
+
+def uploads(request: Request) -> bytes:
     global xsrf
     xsrf['text'], xsrf['image'] = secrets.token_urlsafe(32), secrets.token_urlsafe(32)
 
     return http_200(
         content_type='text/html',
-        content=FileIO('html/index.html').read(
+        content=FileIO('html/uploads.html').read(
             {
                 'messages': message_list,
                 'images': image_list,
@@ -104,7 +111,7 @@ def form_upload(request: Request) -> bytes:
 
 def generate_filename():
     secret = ''
-    while not secret or f'{secret}.jpg' in os.listdir('images'):
+    while not secret or f'{secret}.jpg' in os.listdir('../images'):
         secret = secrets.token_urlsafe(10)
     return secret
 

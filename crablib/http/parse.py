@@ -1,4 +1,5 @@
 import re
+import struct
 from typing import Dict, List, Tuple
 
 
@@ -42,11 +43,13 @@ def parse_request(request: bytes) -> Request:
         body=body
     )
 
+
 class Header:
     def __init__(self, name: str, value: str, options: Dict[str, str]):
         self.name: str = name
         self.value: str = value
         self.options: Dict[str, str] = options
+
 
 def parse_header(s: str) -> Header:
     values = re.split('[;:]\\s*', s)
@@ -77,11 +80,12 @@ class Response:
         for (key, value) in self.headers.items():
             response += f'{key}: {str(value)}\r\n'.encode()
 
+        response += b'\r\n'
+
         if self.body:
-            response += '\r\n'.encode()
             response += self.body
 
-        return response.rstrip('\r\n'.encode())
+        return response
 
     def __str__(self):
         return [self.http_version, self.status_code, self.status_message]
@@ -115,3 +119,83 @@ def parse_form(request: Request) -> Dict[str, bytes]:
             content_name: str = headers_dict['Content-Disposition'].options['name']
             retval[content_name] = body
     return retval
+
+
+def unmask(chunk: bytes, masking_key: bytes) -> bytes:
+    i = 0
+    retval = b''
+    for b in chunk:
+        if i > 3: i = 0
+        retval += (b ^ masking_key[i]).to_bytes(1, 'little')
+        i += 1
+    return retval
+
+class Frame:
+    def __init__(self, FIN: int, RSV1: int, RSV2: int, RSV3: int,
+                 opcode: int, MASK, payload_len: int, data: bytes,
+                 masking_key: bytes = None):
+        self.FIN = FIN
+        self.RSV1 = RSV1
+        self.RSV2 = RSV2
+        self.RSV3 = RSV3
+
+        self.opcode = opcode
+        self.MASK = MASK
+        self.payload_len = payload_len
+        self.masking_key = masking_key
+
+        self.data: bytes = data
+
+    def write_raw(self):
+        retval = b'\x81'
+        if self.payload_len < 126:
+            retval += (self.payload_len | (0x80 * self.MASK)).to_bytes(1, 'little')
+        else:
+            retval += (0x7f | (0x80 * self.MASK)).to_bytes(1, 'little')
+            retval += self.payload_len.to_bytes(2, 'little')
+        if self.MASK:
+            retval += self.masking_key
+            retval += unmask(self.data, self.masking_key)
+
+        else:
+            retval += self.data
+
+        return retval
+
+def parse_frame(frame: bytes) -> Frame:
+    PAYLOAD_SB = 2
+    MASK_SB = 2
+    payload_len: int = frame[1] & 0x7f
+
+    if payload_len == 126:
+        payload_len = struct.unpack('H', frame[2:4])[0]
+        PAYLOAD_SB = MASK_SB = 4
+    # elif payload_len == 127:
+    #     payload_len = struct.unpack('L', frame[2:10])[0]
+    #     PAYLOAD_SB = MASK_SB = 4
+
+    payload: bytes = b''
+    masking_key = None
+    MASK = (frame[1] & 0x80) >> 7
+    if MASK:
+        PAYLOAD_SB += 4
+        masking_key = bytes(x for x in frame[MASK_SB:MASK_SB + 4])
+        payload += unmask(frame[PAYLOAD_SB:], masking_key)
+
+    else:
+        payload = frame[PAYLOAD_SB:PAYLOAD_SB + payload_len]
+
+    parsed_frame = Frame(
+        FIN=(frame[0] & 0x80) >> 7,
+        RSV1=(frame[0] & 0x40) >> 6,
+        RSV2=(frame[0] & 0x20) >> 5,
+        RSV3=(frame[0] & 0x10) >> 4,
+
+        MASK=MASK,
+        opcode=frame[0] & 0x0f,
+
+        payload_len=payload_len,
+        masking_key=masking_key,
+        data=payload
+    )
+    return parsed_frame

@@ -1,0 +1,50 @@
+import unittest
+from crablib.http.parse import Request, parse_frame, Frame, unmask
+import struct
+
+
+class TestFormParse(unittest.TestCase):
+
+    def test_simple_frame(self):
+        test_frame = b'\x81\x06' + 'Hello!'.encode()
+        expected = 'Hello!'.encode()
+        actual = parse_frame(test_frame).data
+        self.assertEqual(expected, actual)
+
+    def test_xor(self):
+        elem = b'\x86\xe2\x7a\x1b\x63'
+        mask = b'\xab\xcd\xef\x53'
+        self.assertEqual(unmask(elem, mask), b'\x2d\x2f\x95\x48\xc8')
+
+    def test_masking_key(self):
+        test_frame = b'\x81\x86' + b'\xff\xff\xff\xff' + 'Hello!'.encode()
+        expected = b'\xb7\x9a\x93\x93\x90\xde'
+        actual = parse_frame(test_frame).data
+        self.assertEqual(expected, actual)
+
+    def test_larger_key(self):
+        test_frame = b'\x81\x7e' + b'\x01\xf4' + (b'A'*500)
+        expected = b'A'*500
+        actual = parse_frame(test_frame).data
+        self.assertEqual(expected, actual)
+
+    def test_send_frame(self):
+        frame = Frame(
+            FIN=1, RSV1=0, RSV2=0, RSV3=0,
+            opcode=1, MASK=0, data=b'hello!', payload_len=6
+        )
+        expected = b'\x81\x06hello!'
+        self.assertEqual(expected, frame.write_raw())
+
+    def test_send_mask_frame(self):
+        frame = Frame(
+            FIN=1, RSV1=0, RSV2=0, RSV3=0,
+            opcode=1, MASK=1, data=b'\x68\x65\x6c\x6c\x6f\x21', payload_len=6,
+            masking_key=b'\xff\xff\xff\xff'
+        )
+        expected = b'\x81\x86' + b'\xff\xff\xff\xff' + b'\x97\x9a\x93\x93\x90\xde'
+        self.assertEqual(expected, frame.write_raw())
+
+
+if __name__ == '__main__':
+    unittest.main()

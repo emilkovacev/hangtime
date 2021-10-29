@@ -1,5 +1,7 @@
+import os.path
 import re
 from typing import Dict, Any
+from os import path as ospath
 
 from crablib.html import generate_html
 
@@ -18,10 +20,11 @@ class FileIO:
 
     def read(self, arguments=None) -> bytes:
         ext = self.extension
+        path = ospath.relpath(self.path)
         if ext == 'html' and arguments:
-            with open(self.path, 'r') as f:
+            with open(path, 'r') as f:
                 return generate_html(f.read(), arguments).encode()
 
         else:
-            with open(self.path, 'rb') as f:
+            with open(path, 'rb') as f:
                 return f.read()

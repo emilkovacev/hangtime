@@ -13,7 +13,7 @@ class TestRequest(unittest.TestCase):
         self.assertEqual(requestA.body, requestB.body)
 
     def test_no_body(self):
-        http_input = b'GET /hello HTTP/1.1\r\nHost: cse312.com'
+        http_input = b'GET /hello HTTP/1.1\r\nHost: cse312.com\r\n\r\n'
         expected = Request(
             request=http_input,
             request_type='GET',
@@ -66,7 +66,7 @@ class TestRequest(unittest.TestCase):
 
 class TestResponse(unittest.TestCase):
     def test_no_body(self):
-        expected_output = 'HTTP/1.1 200 OK\r\nContent-Type: text/plain\r\nContent-Length: 0'
+        expected_output = 'HTTP/1.1 200 OK\r\nContent-Type: text/plain\r\nContent-Length: 0\r\n\r\n'
         output = Response(
             status_code=200,
             status_message='OK',
@@ -96,8 +96,8 @@ class TestResponse(unittest.TestCase):
     def test_unicode(self):
         message = '你好！'
         expected_output = f'HTTP/1.1 200 OK\r\nContent-Type: text/plain; charset=utf-8\r\n' \
-                          f'Content-Length: {len(message.encode())}\r\n' \
-                          f'\r\n{message}'
+                          f'Content-Length: {len(message.encode())}\r\n\r\n' \
+                          f'{message}'
         output = Response(
             status_code=200,
             status_message='OK',

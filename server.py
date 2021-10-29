@@ -15,7 +15,8 @@ class CrabServer(socketserver.BaseRequestHandler):
         return
 
     def handle(self):
-        request: Request = parse_request(self.request.recv(1024))
+        raw: bytes = self.request.recv(2048)
+        request: Request = parse_request(raw)
         if 'Content-Type' in request.headers and request.headers['Content-Type'].split(';')[0] == 'multipart/form-data':
             content_length: int = len(request.body)
             length = int(request.headers.get('Content-Length', 0))  # if content-length, add length
@@ -38,7 +39,7 @@ class CrabServer(socketserver.BaseRequestHandler):
                 try:
                     self.send_response(item.view(request))
                     return
-                except FileNotFoundError as e:
+                except Exception as e:
                     self.send_response(response_404.write_raw())
                     print(e)
         self.send_response(response_404.write_raw())

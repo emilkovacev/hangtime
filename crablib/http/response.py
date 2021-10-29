@@ -1,11 +1,12 @@
 from crablib.http.parse import Response
+from crablib.http.websocket import generate_key
 
 
 def http_200(content_type: str, content: bytes, charset: str = None) -> Response:
     headers = {
-      'Content-Type': content_type,
-      'Content-Length': len(content.strip()),
-      'X-Content-Type-Options': 'nosniff',
+        'Content-Type': content_type,
+        'Content-Length': len(content.strip()),
+        'X-Content-Type-Options': 'nosniff',
     }
 
     if charset:
@@ -54,5 +55,18 @@ def http_404(content_type: str, content: bytes) -> Response:
             'Content-Length': len(content.strip()),
         },
         body=content,
+    )
+    return response
+
+
+def handshake_response(websocket_key: str) -> Response:
+    response = Response(
+        status_code=101,
+        status_message='Switching Protocols',
+        headers={
+            'Upgrade': 'websocket',
+            'Connection': 'Upgrade',
+            'Sec-WebSocket-Accept': generate_key(websocket_key)
+        },
     )
     return response
