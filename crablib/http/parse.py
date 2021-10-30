@@ -130,6 +130,13 @@ def unmask(chunk: bytes, masking_key: bytes) -> bytes:
         i += 1
     return retval
 
+def bytes_to_int(byt: bytes) -> int:
+    retval = 0
+    for i in range(len(byt)):
+        pw = 2*(len(byt)-i-1)
+        retval += byt[i] * (16**pw)
+    return retval
+
 class Frame:
     def __init__(self, FIN: int, RSV1: int, RSV2: int, RSV3: int,
                  opcode: int, MASK, payload_len: int, data: bytes,
@@ -158,11 +165,11 @@ class Frame:
         self.escape()
         retval = b'\x81'
         if self.payload_len < 126:
-            retval += self.payload_len.to_bytes(1, 'little')
+            retval += self.payload_len.to_bytes(1, 'big')
 
         else:
-            retval += b'\x7f'
-            retval += self.payload_len.to_bytes(2, 'little')
+            retval += b'\x7e'
+            retval += self.payload_len.to_bytes(2, 'big')
 
         retval += self.data
         return retval
@@ -184,11 +191,8 @@ def parse_frame(frame: bytes) -> Frame:
     payload_len: int = frame[1] & 0x7f
 
     if payload_len == 126:
-        payload_len = struct.unpack('H', frame[2:4])[0]
+        payload_len = bytes_to_int(frame[2:4])
         PAYLOAD_SB = MASK_SB = 4
-    # elif payload_len == 127:
-    #     payload_len = struct.unpack('L', frame[2:10])[0]
-    #     PAYLOAD_SB = MASK_SB = 4
 
     payload: bytes = b''
     masking_key = None
@@ -199,7 +203,7 @@ def parse_frame(frame: bytes) -> Frame:
         payload += unmask(frame[PAYLOAD_SB:], masking_key)
 
     else:
-        payload = frame[PAYLOAD_SB:PAYLOAD_SB + payload_len]
+        payload = frame[PAYLOAD_SB:]
 
     parsed_frame = Frame(
         FIN=(frame[0] & 0x80) >> 7,

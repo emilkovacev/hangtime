@@ -16,16 +16,14 @@ def websocket(socket, request: Request) -> None:
         while True:
             raw: bytes = socket.request.recv(2048)
             frame: Frame = parse_frame(raw)
-            if frame.opcode == 8:
-                break
             print(raw)
             socket.request.sendall(frame.write_raw())
 
             # ------------these lines crash ---------------
-            client: BaseRequestHandler
-            for client in socket.clients:
-                client.setup()
-                client.request.sendall(frame.write_raw())
+            # client: BaseRequestHandler
+            # for client in socket.clients:
+            #     client.server.socket.sendall(frame.write_raw())
+            #     client.request.sendall(frame.write_raw())
             # ---------------------------------------------
 
     else:

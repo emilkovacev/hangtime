@@ -1,5 +1,5 @@
 import unittest
-from crablib.http.parse import Request, parse_frame, Frame, unmask
+from crablib.http.parse import Request, parse_frame, Frame, unmask, bytes_to_int
 import struct
 
 
@@ -25,8 +25,10 @@ class TestFormParse(unittest.TestCase):
     def test_larger_key(self):
         test_frame = b'\x81\x7e' + b'\x01\xf4' + (b'A'*500)
         expected = b'A'*500
+        frame = parse_frame(test_frame)
         actual = parse_frame(test_frame).data
         self.assertEqual(expected, actual)
+        self.assertEqual(len(expected), frame.payload_len)
 
     def test_send_frame(self):
         frame = Frame(
@@ -35,6 +37,13 @@ class TestFormParse(unittest.TestCase):
         )
         expected = b'\x81\x06hello!'
         self.assertEqual(expected, frame.write_raw())
+
+    def test_bytes_to_int(self):
+        test = b'\x23\xa7'
+        self.assertEqual(bytes_to_int(test), 9127)
+
+        test = b'\x08\x12'
+        self.assertEqual(bytes_to_int(test), 2066)
 
 
 if __name__ == '__main__':
