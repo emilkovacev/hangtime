@@ -15,10 +15,7 @@ class CrabServer(socketserver.BaseRequestHandler):
     def handle(self):
         raw: bytes = self.request.recv(2048)
         if len(raw) == 0: return
-        self.clients.append(self)
-
         request: Request = parse_request(raw)
-        self.clients.append(self)
         print(raw)
 
         self.match(request)
