@@ -36,15 +36,6 @@ class TestFormParse(unittest.TestCase):
         expected = b'\x81\x06hello!'
         self.assertEqual(expected, frame.write_raw())
 
-    def test_send_mask_frame(self):
-        frame = Frame(
-            FIN=1, RSV1=0, RSV2=0, RSV3=0,
-            opcode=1, MASK=1, data=b'\x68\x65\x6c\x6c\x6f\x21', payload_len=6,
-            masking_key=b'\xff\xff\xff\xff'
-        )
-        expected = b'\x81\x86' + b'\xff\xff\xff\xff' + b'\x97\x9a\x93\x93\x90\xde'
-        self.assertEqual(expected, frame.write_raw())
-
 
 if __name__ == '__main__':
     unittest.main()

@@ -146,21 +146,37 @@ class Frame:
 
         self.data: bytes = data
 
+    def escape(self):
+        self.data = self.data \
+            .replace(b'<', b'&lt;') \
+            .replace(b'>', b'&gt;') \
+            .replace(b'&', b'&amp;')
+
+        self.payload_len = len(self.data)
+
     def write_raw(self):
+        self.escape()
         retval = b'\x81'
         if self.payload_len < 126:
-            retval += (self.payload_len | (0x80 * self.MASK)).to_bytes(1, 'little')
+            retval += self.payload_len.to_bytes(1, 'little')
+
         else:
-            retval += (0x7f | (0x80 * self.MASK)).to_bytes(1, 'little')
+            retval += b'\x7f'
             retval += self.payload_len.to_bytes(2, 'little')
-        if self.MASK:
-            retval += self.masking_key
-            retval += unmask(self.data, self.masking_key)
 
-        else:
-            retval += self.data
-
+        retval += self.data
         return retval
+
+    def __str__(self):
+        raw = self.write_raw()
+        output = ''
+        i = 1
+        for b in raw:
+            output += (format(b, '08b')) + ' '
+            if i % 4 == 0: output += '\n'
+            i += 1
+        return output
+
 
 def parse_frame(frame: bytes) -> Frame:
     PAYLOAD_SB = 2

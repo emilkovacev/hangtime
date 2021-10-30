@@ -4,46 +4,39 @@ import socketserver
 
 from crablib.fileIO import FileIO
 from crablib.http.parse import Request, parse_request
+from crablib.http.path import Path
 from crablib.http.response import http_404
-
-from urls import urls, Path
+from urls import urls
 
 
 class CrabServer(socketserver.BaseRequestHandler):
-    def send_response(self, response: bytes):
-        self.request.sendall(response)
-        return
+    clients = []
 
     def handle(self):
         raw: bytes = self.request.recv(2048)
+        if len(raw) == 0: return
+        self.clients.append(self)
+
         request: Request = parse_request(raw)
-        if 'Content-Type' in request.headers and request.headers['Content-Type'].split(';')[0] == 'multipart/form-data':
-            content_length: int = len(request.body)
-            length = int(request.headers.get('Content-Length', 0))  # if content-length, add length
+        self.clients.append(self)
+        print(raw)
 
-            while content_length < length:
-                req = self.request.recv(1024)
-                content_length += len(req)
-                request.body += req
+        self.match(request)
 
-        response_404 = http_404(
-            content_type='text/html',
-            content=FileIO('html/404.html').read()
-        )
+    def match(self, request):
+        response_404 = http_404('text/html', FileIO('html/404.html').read())
 
         item: Path
         for item in urls:
             match = re.match(item.regex, request.path)
-
             if match:
                 try:
-                    self.send_response(item.view(request))
+                    item.view(self, request)
                     return
                 except Exception as e:
-                    self.send_response(response_404.write_raw())
+                    self.request.sendall(response_404.write_raw())
                     print(e)
-        self.send_response(response_404.write_raw())
-        return
+        self.request.sendall(response_404.write_raw())
 
 
 if __name__ == '__main__':

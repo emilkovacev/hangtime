@@ -2,6 +2,12 @@ from crablib.http.parse import Response
 from crablib.http.websocket import generate_key
 
 
+class InvalidRequest(Exception):
+    """
+    Request has invalid parameters
+    """
+
+
 def http_200(content_type: str, content: bytes, charset: str = None) -> Response:
     headers = {
         'Content-Type': content_type,
@@ -64,8 +70,8 @@ def handshake_response(websocket_key: str) -> Response:
         status_code=101,
         status_message='Switching Protocols',
         headers={
-            'Upgrade': 'websocket',
             'Connection': 'Upgrade',
+            'Upgrade': 'websocket',
             'Sec-WebSocket-Accept': generate_key(websocket_key)
         },
     )
