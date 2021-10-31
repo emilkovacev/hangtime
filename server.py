@@ -1,6 +1,7 @@
-import random
 import re
 import socketserver
+from random import randint
+import traceback
 
 from crablib.fileIO import FileIO
 from crablib.http.parse import Request, parse_request
@@ -16,7 +17,6 @@ class CrabServer(socketserver.BaseRequestHandler):
         raw: bytes = self.request.recv(2048)
         if len(raw) == 0: return
         request: Request = parse_request(raw)
-        print(raw)
 
         self.match(request)
 
@@ -33,11 +33,13 @@ class CrabServer(socketserver.BaseRequestHandler):
                 except Exception as e:
                     self.request.sendall(response_404.write_raw())
                     print(e)
+                    print(traceback.format_exc())
+                    print('----------------------')
         self.request.sendall(response_404.write_raw())
 
 
 if __name__ == '__main__':
-    HOST, PORT = '0.0.0.0', random.randint(2000, 9000)
+    HOST, PORT = '0.0.0.0', randint(2000, 8000)
     print(f'starting server for {HOST} at {PORT}')
     with socketserver.ThreadingTCPServer((HOST, PORT), CrabServer) as server:
         server.serve_forever()

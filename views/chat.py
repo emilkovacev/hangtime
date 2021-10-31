@@ -1,10 +1,19 @@
-from socketserver import BaseRequestHandler
-
 from crablib.fileIO import FileIO
 from crablib.http.parse import Request, Response, parse_frame, Frame
 from crablib.http.response import http_200, handshake_response, InvalidRequest
-
+import messages
 import json
+
+
+def load_prev_messages(socket):
+    for client in socket.clients:
+        for data in messages.get_messages():
+            message: str = json.dumps({'username': data['username'], 'comment': data['comment']})
+            message_frame = Frame(
+                FIN=1, RSV1=0, RSV2=0, RSV3=0,
+                opcode=1, payload_len=len(message), MASK=0, data=message.encode()
+            )
+            client.request.sendall(message_frame.write_raw())
 
 
 def websocket(socket, request: Request) -> None:
@@ -14,16 +23,18 @@ def websocket(socket, request: Request) -> None:
         response = handshake_response(key).write_raw()
         socket.request.sendall(response)
 
+        load_prev_messages(socket)
+
         while True:
             raw: bytes = socket.request.recv(2048)
             frame: Frame = parse_frame(raw)
             if frame.opcode == 8: break
-            # socket.request.sendall(frame.write_raw())
 
-            # ------------these lines crash ---------------
+            data = json.loads(frame.data)
+            messages.create_message(data['username'], data['comment'])
+
             for client in socket.clients:
                 client.request.sendall(frame.write_raw())
-            # ---------------------------------------------
 
     else:
         raise InvalidRequest
