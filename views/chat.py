@@ -1,7 +1,7 @@
 from crablib.fileIO import FileIO
-from crablib.http.parse import Request, Response, parse_frame, Frame
+from crablib.http.parse import Request, parse_frame, Frame
 from crablib.http.response import http_200, handshake_response, InvalidRequest
-import messages
+from db import messages
 import json
 
 
@@ -18,28 +18,32 @@ def load_prev_messages(socket):
             pass
 
 
+def load_message(socket):
+    while True:
+        raw: bytes = socket.request.recv(2048)
+        frame: Frame = parse_frame(raw)
+        if frame.opcode == 8: break                                 # end websocket connection
+
+        data = json.loads(frame.data)
+        messages.create_message(username=data['username'], comment=data['comment'])  # store message in db
+
+        for client in socket.clients:                               # send message to each connected client
+            try:
+                client.request.sendall(frame.write_raw())
+            except OSError:
+                pass
+
+
 def websocket(socket, request: Request) -> None:
     if request.request_type == 'GET':
+        # implement websocket handshake
         socket.clients.append(socket)
         key = request.headers['Sec-WebSocket-Key']
         response = handshake_response(key).write_raw()
         socket.request.sendall(response)
 
-        load_prev_messages(socket)
-
-        while True:
-            raw: bytes = socket.request.recv(2048)
-            frame: Frame = parse_frame(raw)
-            if frame.opcode == 8: break
-
-            data = json.loads(frame.data)
-            messages.create_message(data['username'], data['comment'])
-
-            for client in socket.clients:
-                try:
-                    client.request.sendall(frame.write_raw())
-                except OSError:
-                    pass
+        load_prev_messages(socket)  # load messages sent before user loaded
+        load_message(socket)        # load any messages sent while websocket is open
 
     else:
         raise InvalidRequest

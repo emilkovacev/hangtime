@@ -16,6 +16,7 @@ def index(socket, request: Request) -> None:
     else:
         raise InvalidRequest
 
+
 def yoshi(socket, request: Request) -> None:
     if request.request_type == 'GET':
         response = http_200(
@@ -28,6 +29,7 @@ def yoshi(socket, request: Request) -> None:
 
     else:
         raise InvalidRequest
+
 
 # text/css
 def css(socket, request: Request) -> None:
@@ -43,6 +45,7 @@ def css(socket, request: Request) -> None:
     else:
         raise InvalidRequest
 
+
 # script/js
 def js(socket, request: Request) -> None:
     if request.request_type == 'GET':
@@ -55,6 +58,7 @@ def js(socket, request: Request) -> None:
 
     else:
         raise InvalidRequest
+
 
 # image/jpg
 def img(socket, request: Request) -> None:

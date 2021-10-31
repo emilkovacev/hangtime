@@ -76,3 +76,29 @@ def handshake_response(websocket_key: str) -> Response:
         },
     )
     return response
+
+
+def http_201(data: bytes):
+    response = Response(
+        status_code=201,
+        status_message='Created',
+        headers={
+            'Content-Type': 'text/plain',
+            'Content-Length': len(data),
+            'X-Content-Type-Options': 'nosniff',
+        },
+        body=data
+    )
+    return response
+
+def http_204():
+    response = Response(
+        status_code=201,
+        status_message='No Content',
+        headers={
+            'Content-Type': 'text/plain',
+            'Content-Length': 0,
+            'X-Content-Type-Options': 'nosniff',
+        },
+    )
+    return response
