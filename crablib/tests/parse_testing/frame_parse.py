@@ -1,5 +1,5 @@
 import unittest
-from crablib.http.parse import Request, parse_frame, Frame, unmask, bytes_to_int
+from crablib.http.parse import Request, parse_frame, Frame, unmask, bytes_to_int, escape
 import struct
 
 
@@ -44,6 +44,10 @@ class TestFormParse(unittest.TestCase):
 
         test = b'\x08\x12'
         self.assertEqual(bytes_to_int(test), 2066)
+
+    def test_escape(self):
+        html = '<h1>Hello world!</h1>'
+        self.assertEqual('&lt;h1&gt;Hello world!&lt;h1&gt;', escape(html))
 
 
 if __name__ == '__main__':

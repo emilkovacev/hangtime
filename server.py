@@ -2,6 +2,7 @@ import re
 import socketserver
 from random import randint
 import traceback
+import webbrowser
 
 from crablib.fileIO import FileIO
 from crablib.http.parse import Request, parse_request
@@ -39,7 +40,8 @@ class CrabServer(socketserver.BaseRequestHandler):
 
 
 if __name__ == '__main__':
-    HOST, PORT = '0.0.0.0', randint(2000, 8000)
+    HOST, PORT = '0.0.0.0', 8000
     print(f'starting server for {HOST} at {PORT}')
     with socketserver.ThreadingTCPServer((HOST, PORT), CrabServer) as server:
+        webbrowser.open(f'http://localhost:{PORT}')
         server.serve_forever()

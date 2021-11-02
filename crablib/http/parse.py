@@ -93,9 +93,9 @@ class Response:
 
 def escape(html: str) -> str:
     return html \
-        .replace('<', '&#60;') \
-        .replace('>', '&#62;') \
-        .replace('=', '&#61')
+        .replace('<', '&lt;') \
+        .replace('>', '&gt;') \
+        .replace('&', '&amp;')
 
 
 def parse_form(request: Request) -> Dict[str, bytes]:
