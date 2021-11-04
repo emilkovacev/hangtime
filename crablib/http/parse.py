@@ -154,10 +154,10 @@ class Frame:
         self.data: bytes = data
 
     def escape(self):
-        self.data = self.data \
-            .replace(b'<', b'&lt;') \
-            .replace(b'>', b'&gt;') \
-            .replace(b'&', b'&amp;')
+        self.data = self.data           \
+            .replace(b'&', b'&amp;')    \
+            .replace(b'<', b'&lt;')     \
+            .replace(b'>', b'&gt;')     \
 
         self.payload_len = len(self.data)
 
