@@ -103,3 +103,4 @@ function toggleEventForm() {
 
 document.addEventListener('DOMContentLoaded', load);
 document.getElementById('new').addEventListener('click', toggleEventForm)
+
