@@ -1,6 +1,5 @@
 import re
-import struct
-from typing import Dict, List, Tuple
+from typing import Dict, List
 
 
 class Request:
@@ -66,6 +65,39 @@ def parse_header(s: str) -> Header:
     return Header(name=name, value=value, options=options)
 
 
+class Cookie:
+    def __init__(self, name: str, value: str, expires: str = None,
+                 max_age: str = None, secure: bool = True, http_only: bool = True,
+                 same_site: str = 'Strict', path: str = None):
+        self.name: str = name
+        self.value: str = value
+        self.expires = expires
+        self.max_age = max_age
+        self.secure = secure
+        self.http_only = http_only
+        self.path = path
+        self.same_site = same_site
+
+    def write(self) -> str:
+        response: str = f'{self.name}={self.value}'
+        if self.expires:
+            response += f'; {self.expires}'
+        if self.max_age:
+            response += f'; {self.max_age}'
+        if self.secure:
+            response += f'; Secure'
+        if self.http_only:
+            response += f'; HttpOnly'
+        if self.path:
+            response += f'; {self.path}'
+        if self.same_site:
+            response += f'; {self.same_site}'
+        return response
+
+    def __repr__(self):
+        return self.write()
+
+
 class Response:
     def __init__(self, status_code: int, status_message: str, headers,
                  body: bytes = None, http_version: str = 'HTTP/1.1'):
@@ -74,11 +106,15 @@ class Response:
         self.headers = headers
         self.body = body
         self.http_version = http_version
+        self.cookies: List[Cookie] = []
 
     def write_raw(self) -> bytes:
         response: bytes = f'{self.http_version} {self.status_code} {self.status_message}\r\n'.encode()
         for (key, value) in self.headers.items():
             response += f'{key}: {str(value)}\r\n'.encode()
+
+        for cookie in self.cookies:
+            response += f'Set-Cookie: {cookie.write()}\r\n'.encode()
 
         response += b'\r\n'
 
@@ -87,8 +123,23 @@ class Response:
 
         return response
 
+    def add_cookie(self, cookie: Cookie):
+        self.cookies.append(cookie)
+
     def __str__(self):
         return [self.http_version, self.status_code, self.status_message]
+
+
+def parse_cookie(cookie: str) -> Dict[str, Cookie]:
+    cookie_list = re.split(': ', cookie)
+    retval: Dict[str, Cookie] = {}
+    for c in cookie_list:
+        c_headers = c.split('=')
+        retval[c_headers[0]] = Cookie(
+            name=c_headers[0],
+            value=c_headers[1]
+        )
+    return retval
 
 
 def escape(html: str) -> str:
@@ -130,12 +181,14 @@ def unmask(chunk: bytes, masking_key: bytes) -> bytes:
         i += 1
     return retval
 
+
 def bytes_to_int(byt: bytes) -> int:
     retval = 0
     for i in range(len(byt)):
-        pw = 2*(len(byt)-i-1)
-        retval += byt[i] * (16**pw)
+        pw = 2 * (len(byt) - i - 1)
+        retval += byt[i] * (16 ** pw)
     return retval
+
 
 class Frame:
     def __init__(self, FIN: int, RSV1: int, RSV2: int, RSV3: int,
@@ -154,10 +207,10 @@ class Frame:
         self.data: bytes = data
 
     def escape(self):
-        self.data = self.data           \
-            .replace(b'&', b'&amp;')    \
-            .replace(b'<', b'&lt;')     \
-            .replace(b'>', b'&gt;')     \
+        self.data = self.data \
+            .replace(b'&', b'&amp;') \
+            .replace(b'<', b'&lt;') \
+            .replace(b'>', b'&gt;')
 
         self.payload_len = len(self.data)
 

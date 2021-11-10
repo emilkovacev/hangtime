@@ -1,4 +1,6 @@
-from crablib.http.parse import Response
+from typing import Dict, Tuple, List
+
+from crablib.http.parse import Response, Cookie
 from crablib.http.websocket import generate_key
 
 
@@ -8,7 +10,7 @@ class InvalidRequest(Exception):
     """
 
 
-def http_200(content_type: str, content: bytes, charset: str = None) -> Response:
+def http_200(content_type: str, content: bytes, charset: str = None, cookies: List[Cookie] = None) -> Response:
     headers = {
         'Content-Type': content_type,
         'Content-Length': len(content.strip()),
@@ -17,6 +19,9 @@ def http_200(content_type: str, content: bytes, charset: str = None) -> Response
 
     if charset:
         headers['Content-Type'] += f'; charset={charset}'
+
+    if cookies:
+        headers['Set-Cookie'] = cookies
 
     response = Response(
         status_code=200,

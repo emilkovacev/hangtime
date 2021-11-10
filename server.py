@@ -1,3 +1,4 @@
+import random
 import re
 import socketserver
 from random import randint
@@ -40,7 +41,7 @@ class CrabServer(socketserver.BaseRequestHandler):
 
 
 if __name__ == '__main__':
-    HOST, PORT = '0.0.0.0', 8000
+    HOST, PORT = '0.0.0.0', random.randint(1000, 9000)
     print(f'starting server for {HOST} at {PORT}')
     with socketserver.ThreadingTCPServer((HOST, PORT), CrabServer) as server:
         webbrowser.open(f'http://localhost:{PORT}')
