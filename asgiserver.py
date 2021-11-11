@@ -12,8 +12,8 @@ Start by reading through this class. You wont get it all immediately, but thats 
   that actually starts the server. 
 The other important thing to know is that the actual TCP server is created in Server.start_server(). Its created 
   asynchronously by calling await asyncio.start_server(...). In Server.start_server, we define a function handler(...)
-  that wraps basehandler.handler(...). That means when the TCP server created gets a connection, basehandler.handler is
-  called. So after reading this file, thats where you should go nextThe purpose of this wrapper is discussed more in 
+  that wraps basehandler.handler(...). When the TCP server created gets a connection, basehandler.handler is
+  called. After reading this file, that is where you should go next. The purpose of this wrapper is discussed more in 
   Server.start_server's docstring, so check there for more info. 
 """
 
