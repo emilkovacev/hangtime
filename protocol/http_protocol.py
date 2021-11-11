@@ -63,7 +63,7 @@ class HttpProtocol(asyncio.Protocol):
             content = "HTTP/1.1 " + str(status) + " " + msg + "\r\n"
             for key, value in message["headers"]:
                 content += key.decode("ascii").lower() + ": " + value.decode("ascii") + "\r\n"
-            content += "X-Content-Type-Options: nosniff\r\n"
+            content += "X-Content-Type-Options: nosniff\r\n\r\n"
             encoded_start = content.encode()
             # NOTE: asgi docs say not to send data back to the client until
             #  at least one .response.body message has been received, but
