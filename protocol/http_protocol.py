@@ -1,7 +1,5 @@
 import asyncio
-
-from parser import httpparser
-
+from .parser import httpparser
 
 class HttpProtocol(asyncio.Protocol):
     def __init__(self, server, connection_lost_cb=None):

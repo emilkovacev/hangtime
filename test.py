@@ -1,5 +1,5 @@
 from starlette.responses import FileResponse
-from server import Server
+from asgiserver import Server
 
 
 async def app(scope, send, receive):
