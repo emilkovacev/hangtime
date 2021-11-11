@@ -1,6 +1,7 @@
 import asyncio
 from .parser import httpparser
 
+
 class HttpProtocol(asyncio.Protocol):
     def __init__(self, server, connection_lost_cb=None):
         self.server = server
@@ -50,7 +51,7 @@ class HttpProtocol(asyncio.Protocol):
             pass
 
     async def do_asgi(self):
-        response = await self.server.app(self.scope, self.asgi_send, self.asgi_receive)
+        response = await self.server.app(self.scope, self.asgi_receive, self.asgi_send)
         self.shutdown()
         return
 
@@ -77,7 +78,7 @@ class HttpProtocol(asyncio.Protocol):
             self.completed_response_flag = True
             self.message_complete_event.set()
 
-    async def asgi_receive(self):
+    async def asgi_receive(self, *args):
         if not self.completed_response_flag:
             await self.message_complete_event.wait()
             self.message_complete_event.clear()
@@ -93,4 +94,4 @@ class HttpProtocol(asyncio.Protocol):
 
 
 
-STATUS_CODES = {200: "OK", 400: "NOT FOUND"}
+STATUS_CODES = {200: "OK", 404: "NOT FOUND"}
