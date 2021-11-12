@@ -66,6 +66,10 @@ class HttpParser:
         return x
 
     @property
+    def asgi_headers(self):
+        return [(key, value) for key, value in self.headers.items()]
+
+    @property
     def root_route(self):
         return "/" + self.route.split("/")
 

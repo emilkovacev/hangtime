@@ -48,7 +48,7 @@ class HttpProtocol(asyncio.Protocol):
         for key, value in dict({"method": self.parser.method, "path": self.parser.route,
                            "raw_path": self.parser.route.encode("ascii"),
                            "query_string": self.parser.query_string.encode("ascii"),
-                           "headers": self.parser.headers, "client": self.client_addr,
+                           "headers": self.parser.asgi_headers, "client": self.client_addr,
                            "server": self.server_addr}).items():
             self.scope[key] = value
         self.message_complete_event.set()
