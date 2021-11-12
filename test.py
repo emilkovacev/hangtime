@@ -1,6 +1,11 @@
 from starlette.applications import Starlette
 from starlette.routing import Route
 from starlette.responses import FileResponse
+from starlette.routing import Mount
+from starlette.staticfiles import StaticFiles
+
+import os
+
 from asgiserver import Server
 """
 If you havent already, read the specifications for ASGI: https://asgi.readthedocs.io/en/latest/specs/main.html, its not
@@ -13,15 +18,20 @@ If you havent already, read the specifications for ASGI: https://asgi.readthedoc
 
 
 def index(request):
-    return FileResponse("index.html")
+    return FileResponse("templates/calendar.html")
 
+def style(request):
+    return StaticFiles("/css/style.css")
 
 def startup():
     print("Started")
 
-
+script_dir = os.path.dirname(__file__)
+st_abs_file_path = os.path.join(script_dir, "static/")
 routes = [
-    Route("/", index)
+    Route("/", index),
+    Mount('/static', app=StaticFiles(directory=st_abs_file_path), name="static"),
+    Route('/css/style.css', style)
 ]
 
 
