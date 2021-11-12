@@ -1,5 +1,21 @@
 import asyncio
 from .parser import httpparser
+"""
+Glad to see you've made it. You look tired, maybe sit down and have a rest. Drink some water. Eat some food. 
+...
+Feeling better? Good, lets talk HttpProtocol. As discussed in basehandler (youre going in order right?) this class 
+  defines the rules of the HTTP protocol. It also provides the send and receive methods used by ASGI. The first method
+  called is .start_connection(...), which tells the ASGI Server that a connection has been made and assigns the 
+  transport passed from handler(). Next data_received(...) is called from handle(). This is what actually starts 
+  processing the request. It passes the data to a parser, then uses the info from the request to define the asgi scope.
+  Finally it sends a signal to indicate the full message has been received, and creates a task from .do_asgi().
+All do_asgi() does is awaits the ASGI application then calls shutdown once it has completed. The ASGI application will
+  call .asgi_send and .asgi_receive as needed. After completing the request .asgi_receive sends an ASGI http.shutdown 
+  event to the application which causes the asgi app task started in do_asgi to end, and then .shutdown is called.
+  If you're confused about what asgi_send and receive are doing check out the docs for the HTTP format:
+    https://asgi.readthedocs.io/en/latest/specs/www.html 
+This is assuming the request wasn't and upgrade request. That'll be covered once its implemented.
+"""
 
 
 class HttpProtocol(asyncio.Protocol):
@@ -78,7 +94,7 @@ class HttpProtocol(asyncio.Protocol):
             self.completed_response_flag = True
             self.message_complete_event.set()
 
-    async def asgi_receive(self, *args):
+    async def asgi_receive(self):
         if not self.completed_response_flag:
             await self.message_complete_event.wait()
             self.message_complete_event.clear()
