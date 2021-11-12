@@ -1,11 +1,15 @@
 from crablib.http.path import Path
-from views import static, chat, api
-
+from views import static, chat, api, auth
 
 urls = [
     Path('^/$', static.index),
 
-    # websocket paths
+    # login paths
+    Path('^/login$', auth.login),
+    Path('^/register$', auth.register),
+
+    # chat paths
+    Path('^/chat$', chat.index),
     Path('^/script/websocket.js$', chat.websocketjs),
     Path('^/websocket$', chat.websocket),
 

@@ -1,18 +1,40 @@
 import re
-from typing import Dict, List
+from typing import Dict, List, Any
 
 loops = re.compile('{%\\s*(?P<exp>\\w+)\\s(?P<var>\\w+)\\sin\\s(?P<arg>\\w+)\\s*%}[\n]*'
                    '(?P<content>.*?)[\n\\s]*{%\\s*endfor\\s*%}')
 
+conditionals = re.compile('{%\\s*if\\s(?P<not>not)?\\s*(?P<condition>\\w+)\\s*%}[\n]+'
+                          '(?P<content>.+?)[\n\\s]*{%\\s*endif\\s*%}', re.DOTALL)
+
 variables = re.compile('{{\\s*(?P<var>\\w+)\\s*}}')
 
-def generate_html(html: str, arguments: Dict[str, str]):
+def generate_html(html: str, arguments: Dict[str, Any]):
     def replace_var(matchobj: re.Match) -> str:
         var = matchobj.groupdict()['var']
+
         if var in arguments:
             return arguments[var]
         else:
             raise ArgNotFoundError(var)
+
+    def replace_if(matchobj: re.Match) -> str:
+        content = matchobj.groupdict()['content']
+        condition = matchobj.groupdict()['condition']
+        op = matchobj.groupdict()['not']
+
+        if condition not in arguments:
+            raise ArgNotFoundError(condition)
+
+        condition = arguments[condition]
+        if op:
+            condition = not condition
+
+        if condition:
+            return content
+
+        else:
+            return ''
 
     def replace_loop(matchobj: re.Match) -> str:
         retval = ''
@@ -34,7 +56,8 @@ def generate_html(html: str, arguments: Dict[str, str]):
         return retval
 
     repl_loops = loops.sub(replace_loop, html)
-    repl_var = variables.sub(replace_var, repl_loops)  # replace variables
+    repl_condition = conditionals.sub(replace_if, repl_loops)
+    repl_var = variables.sub(replace_var, repl_condition)  # replace variables
 
     return repl_var
 

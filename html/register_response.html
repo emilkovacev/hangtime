@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <link rel="stylesheet" href="/style/style.css">
+    </head>
+
+    <body>
+        <h1 id="header">Create an Account</h1>
+        <div class="form-bg">
+            <form action="/register" method="post" enctype="multipart/form-data">
+                <label for="username">Email</label><br>
+                <input type="text" name="email"><br><br>
+                <label for="username">Username</label><br>
+                <input type="text" name="username"><br><br>
+                <label for="password">Password</label><br>
+                <input type="password" name="password"><br><br>
+                <input type="submit" value="Register"><br><br>
+                <a href="/">Log in</a>
+
+                {% if not good_password %}
+                    <p class="error">Password does not meet criteria</p>
+                {% endif %}
+
+                {% if good_password %}
+                    <p class="success">Account Registered!</p>
+                {% endif %}
+            </form>
+        </div>
+
+    </body>
+</html>

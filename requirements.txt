@@ -1,0 +1,2 @@
+pymongo
+bcrypt==3.2.0

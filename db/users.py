@@ -1,7 +1,7 @@
 from bson import ObjectId
 from pymongo import MongoClient
 
-mongo_client = MongoClient('mongo')
+mongo_client = MongoClient('localhost')
 db = mongo_client['chatapp']
 
 user_collection = db['users']

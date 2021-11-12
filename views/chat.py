@@ -5,6 +5,21 @@ from db import messages
 import json
 
 
+def index(socket, request: Request):
+    if request.request_type == 'GET':
+
+        response = http_200(
+            content_type='text/html',
+            content=FileIO('html/chat.html').read(),
+            charset='utf-8',
+        )
+
+        socket.request.sendall(response.write_raw())
+
+    else:
+        raise InvalidRequest
+
+
 def load_prev_messages(socket):
     for data in messages.get_messages():
         message: str = json.dumps({'username': data['username'], 'comment': data['comment']})
