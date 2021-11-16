@@ -2,45 +2,30 @@ import re
 import string
 from typing import Dict, List
 import bcrypt
+import secrets
 
 from crablib.fileIO import FileIO
-from crablib.http.parse import Request, parse_form, Response, parse_cookie, Cookie
+from crablib.http.parse import Request, parse_form, Response, Cookie
 from crablib.http.response import http_200, InvalidRequest, http_301
-from db.account import create_account, get_account
+from db.account import create_account, get_account, add_token
 
 
 def login(socket, request: Request):
     if request.request_type == 'GET':
-        page_visits_cookie = None
+        cookie = Cookie('page-visits', str(1), str(7200), secure=False)
 
-        if 'Cookie' not in request.headers:
-            cookie = Cookie(
-                name='page-visits',
-                value=str(1),
-                max_age=str(7200),
-                secure=False,
-            )
-            page_visits_cookie = cookie
+        if 'page-visits' in request.cookies:
+            cookie.value = str(int(request.cookies['page-visits']) + 1)
 
-        else:
-            cookies: Dict[str, Cookie] = parse_cookie(request.headers['Cookie'])
-            if 'page-visits' in cookies:
-                updated_cookie = cookies['page-visits']
-                updated_cookie.value = str(int(updated_cookie.value) + 1)
-                page_visits_cookie = updated_cookie
+        arguments = {'page_visits': cookie.value}
+        response: Response = http_200('text/html', FileIO('html/login.html').read(arguments), 'utf-8')
 
-        response: Response = http_200(
-            content_type='text/html',
-            content=FileIO('html/login.html').read({'page_visits': page_visits_cookie.value}),
-            charset='utf-8',
-        )
-
-        response.add_cookie(page_visits_cookie)
+        response.add_cookie(cookie)
         socket.request.sendall(response.write_raw())
 
     elif request.request_type == 'POST':
         form: Dict[str, bytes] = parse_form(request)
-        username = form['username']
+        username = form['username'].decode()
         password = form['password']
 
         if len(username) == 0 or len(password) == 0:
@@ -48,12 +33,29 @@ def login(socket, request: Request):
             socket.request.sendall(response.write_raw())
             return
 
-        account = get_account(str(username))
-        hashed = bcrypt.hashpw(password, account['salt'])
+        account = get_account(username)
+        hashed = bcrypt.hashpw(password, account['salt'].encode()).decode()
+
         if hashed == account['password_hash']:
             # we're good to login!
+            response = http_301('/')
+
+            auth_token: str = secrets.token_urlsafe(30)
+            cookie = Cookie(
+                name='auth_token',
+                value=auth_token,
+                max_age=str(7200),
+                secure=False
+            )
+            response.add_cookie(cookie)
+            auth_token_salt = b'$2b$12$Fr9yR03IQLCGqjB1MJ9gfu'
+            auth_token_hash = bcrypt.hashpw(auth_token.encode(), auth_token_salt)
+            add_token(username, auth_token_hash.decode())
+
             print('successful login')
-            socket.request.sendall(http_200('text/simple', b'login successful!').write_raw())
+
+            socket.request.sendall(response.write_raw())
+            
         else:
             print('failed login attempt')
             socket.request.sendall(http_200('text/simple', b'login failed :(').write_raw())
@@ -78,41 +80,36 @@ def check_password(password: str) -> bool:
 
 def register_response(arguments=None):
     if not arguments:
-        return http_200(
-            content_type='text/html',
-            content=FileIO('html/register.html').read(),
-            charset='utf-8',
-        )
+        return http_200('text/html', FileIO('html/register.html').read(), 'utf-8')
     else:
-        return http_200(
-            content_type='text/html',
-            content=FileIO('html/register_response.html').read(arguments),
-            charset='utf-8',
-        )
+        return http_200('text/html', FileIO('html/register_response.html').read(arguments), 'utf-8')
 
 def register(socket, request: Request):
     if request.request_type == 'GET':
-
         socket.request.sendall(register_response().write_raw())
 
     elif request.request_type == 'POST':
         form: Dict[str, bytes] = parse_form(request)
-        email = form['email']
-        username = form['username']
+        email = form['email'].decode()
+        username = form['username'].decode()
         password = form['password']
-        #
-        # if get_account(str(username)):
-        #     socket.request.sendall(register_response({'already_taken': True, 'good_password': True}).write_raw())
-        #     return
+        print(password)
+
         if not check_password(str(password)):
-            socket.request.sendall(register_response({'already_taken': False, 'good_password': False}).write_raw())
+            arguments = {'username_taken': False, 'good_password': False}
+            socket.request.sendall(register_response(arguments).write_raw())
             return
 
         salt = bcrypt.gensalt()
         hashed = bcrypt.hashpw(password, salt)
-        create_account(str(email), str(username), hashed, salt)
+        account = create_account(str(email), username, hashed.decode(), salt.decode())
 
-        socket.request.sendall(register_response({'already_taken': False, 'good_password': True}).write_raw())
+        if account:
+            arguments = {'username_taken': False, 'good_password': True}
+            socket.request.sendall(register_response(arguments).write_raw())
+        else:
+            arguments = {'username_taken': True, 'good_password': True}
+            socket.request.sendall(register_response(arguments).write_raw())
 
     else:
         raise InvalidRequest

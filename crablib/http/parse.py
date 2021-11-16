@@ -4,13 +4,15 @@ from typing import Dict, List
 
 class Request:
     def __init__(self, request: bytes, request_type: str,
-                 path: str, headers: Dict[str, str], http_version: str = 'HTTP/1.1', body: bytes = b''):
+                 path: str, headers: Dict[str, str], http_version: str = 'HTTP/1.1',
+                 cookies: Dict[str, str] = None, body: bytes = b''):
         self.request = request
         self.request_type = request_type
         self.path = path
         self.http_version = http_version
         self.headers = headers
         self.body = body
+        self.cookies: Dict[str, str] = cookies
 
     def __str__(self):
         return [self.http_version, self.path, self.request_type]
@@ -25,7 +27,7 @@ def parse_request(request: bytes) -> Request:
     request_type, path = first_line[0], first_line[1]
     headers = lines[1:]
 
-    parsed_headers = {}
+    parsed_headers: Dict[str, str] = {}
     for h in headers:
         parts = re.split(':\\s*', h)
         parsed_headers[parts[0]] = parts[1]
@@ -34,12 +36,20 @@ def parse_request(request: bytes) -> Request:
     if 'Content-Length' in parsed_headers:
         body = request[i + 4: i + 4 + int(parsed_headers['Content-Length'])]
 
+    cookies = {}
+    if 'Cookie' in parsed_headers:
+        parts = re.split('; ', parsed_headers['Cookie'])
+        for cookie in parts:
+            sections = cookie.split('=')
+            cookies[sections[0]] = sections[1]
+
     return Request(
         request=request,
         request_type=request_type,
         path=path,
         headers=parsed_headers,
-        body=body
+        body=body,
+        cookies=cookies
     )
 
 
@@ -94,9 +104,6 @@ class Cookie:
             response += f'; {self.same_site}'
         return response
 
-    def __repr__(self):
-        return self.write()
-
 
 class Response:
     def __init__(self, status_code: int, status_message: str, headers,
@@ -106,14 +113,14 @@ class Response:
         self.headers = headers
         self.body = body
         self.http_version = http_version
-        self.cookies: List[Cookie] = []
+        self.cookies: Dict[str, Cookie] = {}
 
     def write_raw(self) -> bytes:
         response: bytes = f'{self.http_version} {self.status_code} {self.status_message}\r\n'.encode()
         for (key, value) in self.headers.items():
             response += f'{key}: {str(value)}\r\n'.encode()
 
-        for cookie in self.cookies:
+        for cookie in self.cookies.values():
             response += f'Set-Cookie: {cookie.write()}\r\n'.encode()
 
         response += b'\r\n'
@@ -124,7 +131,7 @@ class Response:
         return response
 
     def add_cookie(self, cookie: Cookie):
-        self.cookies.append(cookie)
+        self.cookies[cookie.name] = cookie
 
     def __str__(self):
         return [self.http_version, self.status_code, self.status_message]

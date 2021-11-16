@@ -1,11 +1,23 @@
+import bcrypt
+
 from crablib.fileIO import FileIO
 from crablib.http.parse import Request
 from crablib.http.response import InvalidRequest, http_301
 from crablib.http.response import http_200
+from db.account import get_account_from_token
 
 
 def index(socket, request: Request) -> None:
     if request.request_type == 'GET':
+        if request.cookies and 'auth_token' in request.cookies:
+            salt = b'$2b$12$Fr9yR03IQLCGqjB1MJ9gfu'
+            auth_token_hash: str = bcrypt.hashpw(request.cookies['auth_token'].encode(), salt).decode()
+            account = get_account_from_token(auth_token_hash)
+
+            if account and account['auth_token_hash'] == auth_token_hash:
+                username = account['username']
+                socket.request.sendall(http_200('text/simple', f'welcome back {username}!'.encode()).write_raw())
+
         response = http_301('/login')
         socket.request.sendall(response.write_raw())
 

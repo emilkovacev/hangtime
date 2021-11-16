@@ -19,9 +19,9 @@
 
                 {% if not good_password %}
                     <p class="error">Password does not meet criteria</p>
-                {% endif %}
-
-                {% if good_password %}
+                {% elif username_taken %}
+                    <p class="error">Username already taken</p>
+                {% else %}
                     <p class="success">Account Registered!</p>
                 {% endif %}
             </form>
