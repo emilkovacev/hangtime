@@ -1,5 +1,4 @@
 import asyncio
-from queue import Queue
 from .parser import httpparser
 """
 Glad to see you've made it. You look tired, maybe sit down and have a rest. Drink some water. Eat some food. 
@@ -34,8 +33,6 @@ class HttpProtocol(asyncio.Protocol):
                       "client": None, "server": None}
         self.message_complete_event = asyncio.Event()
         self.completed_response_flag = False
-        self.asgi = None
-        self.buffered_messages = Queue(0)
 
     def start_connection(self, transport):
         self.server.connections.append(self)
@@ -43,8 +40,8 @@ class HttpProtocol(asyncio.Protocol):
 
         socket_info = transport.get_extra_info('socket')
         if socket_info is not None:
-            self.client_addr = socket_info.getpeername()
-            self.server_addr = socket_info.getsockname()
+            self.client_addr = socket_info.getsockname()
+            self.server_addr = socket_info.getpeername()
 
     def data_received(self, data: bytes) -> None:
         self.parser = httpparser.HttpParser(data, self.protocol_upgrade_callback)
@@ -55,25 +52,9 @@ class HttpProtocol(asyncio.Protocol):
                            "server": self.server_addr}).items():
             self.scope[key] = value
         self.message_complete_event.set()
-        asgi = ASGIWrapper(self.server.app, self.scope, self.do_next_message, self.transport, self.message_complete_event,
-                                self.completed_response_flag)
-
-        if self.asgi is None:
-            self.asgi = asgi
-            task = self.loop.create_task(asgi.do_asgi())
-            task.add_done_callback(self.server.tasks.remove)
-            self.server.tasks.append(task)
-        else: # A request is being handled
-            self.buffered_messages.put((self.scope, asgi))
-
-    def do_next_message(self):
-        if self.buffered_messages.qsize() != 0:
-            scope, asgi = self.buffered_messages.get()
-            task = self.loop.create_task(asgi.do_asgi())
-            task.add_done_callback(self.server.tasks.remove)
-            self.server.tasks.append(task)
-        else:
-            self.shutdown()
+        task = self.loop.create_task(self.do_asgi())
+        task.add_done_callback(self.server.tasks.remove)
+        self.server.tasks.append(task)
 
     def protocol_upgrade_callback(self):
         pass
@@ -85,30 +66,14 @@ class HttpProtocol(asyncio.Protocol):
         except asyncio.exceptions.InvalidStateError:
             pass
 
-
-class ASGIWrapper:
-    def __init__(self, app, scope, shutdown, transport, message_event, message_flag):
-        self.app = app
-        self.scope = scope
-        self.shutdown = shutdown
-        self.transport = transport
-        self.message_complete_event = message_event
-        self.completed_response_flag = message_flag
-        self.partial_response = None
-
     async def do_asgi(self):
-        response = await self.app(self.scope, self.asgi_receive, self.asgi_send)
+        response = await self.server.app(self.scope, self.asgi_receive, self.asgi_send)
         self.shutdown()
         return
 
     async def asgi_send(self, message):
         more_body = True
         if message["type"] == "http.response.start":
-            if self.partial_response is not None:
-                print("New Message Started Before Current Message Finished!")
-                print(message)
-                print(self.partial_response)
-                return
             status = message["status"]
             msg = STATUS_CODES[status]
             content = "HTTP/1.1 " + str(status) + " " + msg + "\r\n"
@@ -121,10 +86,6 @@ class ASGIWrapper:
             #  uvicorn does not do this.
             self.partial_response = encoded_start
         elif message["type"] == "http.response.body":
-            if self.partial_response is None:
-                print("Tried to send message body without sending headers!")
-                print(message)
-                return
             body = message.get("body", "")
             more_body = message.get("more_body", False)
             self.transport.write(self.partial_response + body)
@@ -132,7 +93,6 @@ class ASGIWrapper:
         if not more_body:
             self.completed_response_flag = True
             self.message_complete_event.set()
-            self.partial_response = None
 
     async def asgi_receive(self):
         if not self.completed_response_flag:
@@ -150,4 +110,4 @@ class ASGIWrapper:
 
 
 
-STATUS_CODES = {200: "OK", 404: "NOT FOUND", 500: "???", 307: "TEMPORARY REDIRECT"}
+STATUS_CODES = {200: "OK", 404: "NOT FOUND"}

@@ -20,24 +20,24 @@ If you havent already, read the specifications for ASGI: https://asgi.readthedoc
 def index(request):
     return FileResponse("templates/calendar.html")
 
-
-def style(req):
-    return FileResponse("static/css/style.css")
-
+def style(request):
+    return StaticFiles("/css/style.css")
 
 def startup():
     print("Started")
 
-
+script_dir = os.path.dirname(__file__)
+st_abs_file_path = os.path.join(script_dir, "static/")
 routes = [
     Route("/", index),
-    Mount('/static', app=StaticFiles(directory="static"), name="static"),
+    Mount('/static', app=StaticFiles(directory=st_abs_file_path), name="static"),
+    Route('/css/style.css', style)
 ]
 
 
 def main():
     app = Starlette(debug=True, routes=routes, on_startup=[startup])
-    server = Server(app, "127.0.0.1", "8080")
+    server = Server(app, "localhost", "8080")
     # This starts the server task
     server.run()
 
