@@ -7,6 +7,7 @@ urls = [
     # login paths
     Path('^/login$', auth.login),
     Path('^/register$', auth.register),
+    Path('^/auth$', auth.auth),
 
     # chat paths
     Path('^/chat$', chat.index),
@@ -14,7 +15,6 @@ urls = [
     Path('^/websocket$', chat.websocket),
 
     # default paths
-    Path('^/yoshi$', static.yoshi),
     Path('^/(images/[^.]+.(jpg|jpeg))$', static.img),
     Path('^/(style/[^.]+.css)$', static.css),
     Path('^/(script/[^.]+.js)$', static.js),

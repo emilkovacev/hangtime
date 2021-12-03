@@ -17,13 +17,28 @@
                 <input type="submit" value="Register"><br><br>
                 <a href="/">Log in</a>
 
-                {% if not good_password %}
+                <ul>
+                    Password Requirements
+                    <li>A minimum length of 8</li>
+                    <li>At least 1 lowercase character</li>
+                    <li>At least 1 uppercase character</li>
+                    <li>At least 1 number</li>
+                    <li>At least 1 special character</li>
+                </ul>
+
+                {% if static %}
+
+                {% elif not good_password %}
                     <p class="error">Password does not meet criteria</p>
                 {% elif username_taken %}
                     <p class="error">Username already taken</p>
-                {% else %}
+                {% elif password_taken %}
+                    <p class="error">user {{ user }} already used this password ;)</p>
+                {% elif registered %}
                     <p class="success">Account Registered!</p>
                 {% endif %}
+
+
             </form>
         </div>
 

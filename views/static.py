@@ -16,24 +16,10 @@ def index(socket, request: Request) -> None:
 
             if account and account['auth_token_hash'] == auth_token_hash:
                 username = account['username']
-                socket.request.sendall(http_200('text/simple', f'welcome back {username}!'.encode()).write_raw())
+                return socket.request.sendall(http_200('text/simple', f'welcome back {username}!'.encode()).write_raw())
 
         response = http_301('/login')
-        socket.request.sendall(response.write_raw())
-
-    else:
-        raise InvalidRequest
-
-
-def yoshi(socket, request: Request) -> None:
-    if request.request_type == 'GET':
-        response = http_200(
-            content_type='text/html',
-            content=FileIO('html/yoshi.html').read(),
-            charset='utf-8'
-        ).write_raw()
-
-        socket.request.sendall(response)
+        return socket.request.sendall(response.write_raw())
 
     else:
         raise InvalidRequest

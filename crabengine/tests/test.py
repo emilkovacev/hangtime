@@ -1,6 +1,6 @@
 import unittest
 
-from generate import generate_html
+from ..generate import generate_html
 
 
 class TestFormParse(unittest.TestCase):

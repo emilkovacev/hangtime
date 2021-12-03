@@ -20,6 +20,14 @@
                 <input type="submit" value="Login"><br><br>
                 <a href="/register">Register an account</a>
             </form>
+
+            {% if not username_exists %}
+                <p class="error">Username not registered</p>
+            {% elif not correct_password %}
+                <p class="error">Incorrect password</p>
+            {% else %}
+
+        {% endif %}
         </div>
 
     </body>

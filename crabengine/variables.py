@@ -11,4 +11,5 @@ def replace_var(matchobj: re.Match, arguments: Dict[str, Any]) -> str:
     if var in arguments:
         return arguments[var]
     else:
-        raise ArgNotFoundError(var)
+        # raise ArgNotFoundError(var)
+        return ''

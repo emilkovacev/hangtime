@@ -77,12 +77,12 @@ def parse_header(s: str) -> Header:
 
 class Cookie:
     def __init__(self, name: str, value: str, expires: str = None,
-                 max_age: str = None, secure: bool = True, http_only: bool = True,
+                 max_age: int = None, secure: bool = True, http_only: bool = True,
                  same_site: str = 'Strict', path: str = None):
         self.name: str = name
         self.value: str = value
         self.expires = expires
-        self.max_age = max_age
+        self.max_age = str(max_age)
         self.secure = secure
         self.http_only = http_only
         self.path = path
@@ -91,18 +91,21 @@ class Cookie:
     def write(self) -> str:
         response: str = f'{self.name}={self.value}'
         if self.expires:
-            response += f'; {self.expires}'
+            response += f'; Expires={self.expires}'
         if self.max_age:
-            response += f'; {self.max_age}'
+            response += f'; Max-Age={self.max_age}'
         if self.secure:
             response += f'; Secure'
         if self.http_only:
             response += f'; HttpOnly'
         if self.path:
-            response += f'; {self.path}'
+            response += f'; Path={self.path}'
         if self.same_site:
-            response += f'; {self.same_site}'
+            response += f'; SameSite={self.same_site}'
         return response
+
+    def __str__(self) -> str:
+        return self.write()
 
 
 class Response:

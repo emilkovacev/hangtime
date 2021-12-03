@@ -21,7 +21,8 @@ def replace_if(matchobj: re.Match, arguments: Dict[str, Any]) -> str:
         if statement == 'else':
             return content
         elif condition not in arguments:
-            raise ArgNotFoundError
+            # raise ArgNotFoundError
+            continue
 
         condition = arguments[condition]
         if _not:

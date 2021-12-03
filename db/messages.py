@@ -1,6 +1,8 @@
 from pymongo import MongoClient
 
-mongo_client = MongoClient('localhost')
+from db import HOST
+
+mongo_client = MongoClient(HOST)
 db = mongo_client['chatapp']
 
 message_collection = db['messages']

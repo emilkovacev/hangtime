@@ -1,7 +1,8 @@
-from bson import ObjectId
 from pymongo import MongoClient
 
-mongo_client = MongoClient('localhost')
+from db import HOST
+
+mongo_client = MongoClient(HOST)
 db = mongo_client['chatapp']
 
 account_collection = db['accounts']
@@ -26,6 +27,9 @@ def get_account(username: str):
 
 def get_account_from_token(auth_token_hash: str):
     return account_collection.find_one({'auth_token_hash': auth_token_hash})
+
+def get_account_from_password(password_hash: str):
+    return account_collection.find_one({'password_hash': password_hash})
 
 def add_token(username: str, auth_token_hash: str):
     account_collection.update_one(
