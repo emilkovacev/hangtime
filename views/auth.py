@@ -98,7 +98,6 @@ def check_password(password: str) -> bool:
         len(re.findall(f'[{string.punctuation}]', password))
     ]
     for condition in conditions:
-        print(condition)
         if not condition:
             return False
     return True
