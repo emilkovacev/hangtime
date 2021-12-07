@@ -92,12 +92,13 @@ def logout(socket, request: Request):
 def check_password(password: str) -> bool:
     conditions = [
         len(password) >= 8,
-        len(re.findall('[a-z]', password)) > 1,
-        len(re.findall('[A-Z]', password)) > 1,
-        len(re.findall('[0-9]', password)) > 1,
+        len(re.findall('[a-z]', password)) >= 1,
+        len(re.findall('[A-Z]', password)) >= 1,
+        len(re.findall('[0-9]', password)) >= 1,
         len(re.findall(f'[{string.punctuation}]', password))
     ]
     for condition in conditions:
+        print(condition)
         if not condition:
             return False
     return True
