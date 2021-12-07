@@ -26,3 +26,11 @@ class FileIO:
         else:
             with open(path, 'rb') as f:
                 return f.read()
+
+    def read_template(self, arguments=None) -> bytes:
+        path = ospath.relpath(self.path)
+        if not arguments:
+            arguments = {}
+
+        with open(path, 'r') as f:
+            return generate_html(f.read(), arguments).encode()

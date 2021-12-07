@@ -63,7 +63,6 @@ function loadEvents() {
         eventBlock.style.height = (Math.round(end - start)).toString() + 'px';
         eventBlock.style.backgroundColor = event.color;
         eventBlock.style.marginLeft = (SHIFT * intersections(event)).toString() + 'px';
-
         calendar.appendChild(eventBlock);
     }
 }

@@ -1,21 +1,41 @@
 <!DOCTYPE html>
 <html>
     <head>
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css">
+    <!-- Bootstrap Font Icon CSS -->
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.5.0/font/bootstrap-icons.css">
         <link rel="stylesheet" href="/style/style.css">
     </head>
 
     <body>
-        <div class="background">
-            <h1 id="header">Hello! You have entered the Big Yoshi Domain</h1>
+        <nav class="navbar navbar-light px-3 mb-5" style="background-color: #e3f2fd;">
+            <a href="/" class="nav-link"><h3>Hangtime</h3></a>
+            <a href="/logout" class="nav-link"><p>Logout</p></a>
+        </nav>
+
+        <div class="container">
+            <h1>Users</h1>
+            {% for user in users %}
+                {{ user }}
+            {% endfor %}
         </div>
 
-        <label for="chat-name">Name: </label>
-        <input id="chat-name" type="text" name="name">
-        <br/>
-        <label for="chat-comment">Comment: </label>
-        <input id="chat-comment" type="text" name="comment">
+        <div class="container"><h1>Chat</h1></div>
 
-        <button onclick="sendMessage()">Chat</button>
+        <div class="container d-flex mb-3">
+            <select class="form-select me-3" aria-label="Default select example" style="width: 200px;">
+                <option selected>-</option>
+                {% for user in users %}
+                    <option value="{{ user }}">{{ user }}</option>
+                {% endfor %}
+            </select>
+            <input id="chat-comment" type="text" name="comment" class="form-control" placeholder="Comment"><br/>
+        </div>
+
+        <div class="container">
+            <button onclick="sendMessage()" class="btn btn-primary mb-3">Chat</button>
+        </div>
+
 
         <div id="chat"></div>
         <script src="../script/websocket.js"></script>

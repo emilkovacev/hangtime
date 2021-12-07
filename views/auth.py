@@ -1,26 +1,20 @@
 import re
 import string
-from typing import Dict, List
+from typing import Dict
 import bcrypt
 import secrets
 
 from crablib.fileIO import FileIO
 from crablib.http.parse import Request, parse_form, Response, Cookie
 from crablib.http.response import http_200, InvalidRequest, http_301, http_403
-from db.account import create_account, get_account, add_token, get_account_from_password, get_account_from_token
+from crablib.auth import get_request_account
+from db.account import create_account, get_account, add_token, get_account_from_token
+
 
 
 def login(socket, request: Request):
     if request.request_type == 'GET':
-        cookie = Cookie('page-visits', str(1), max_age=7200, secure=False)
-
-        if 'page-visits' in request.cookies:
-            cookie.value = str(int(request.cookies['page-visits']) + 1)
-
-        arguments = {'page_visits': cookie.value}
-        response: Response = http_200('text/html', FileIO('html/login.html').read(arguments), 'utf-8')
-
-        response.add_cookie(cookie)
+        response: Response = http_200('text/html', FileIO('html/login.html').read_template(), 'utf-8')
         return socket.request.sendall(response.write_raw())
 
     elif request.request_type == 'POST':
@@ -67,7 +61,7 @@ def login(socket, request: Request):
 
             print('successful login')
             return socket.request.sendall(response.write_raw())
-            
+
         else:
             print('failed login attempt')
             arguments = {'username_exists': True, 'correct_password': False}
@@ -76,6 +70,23 @@ def login(socket, request: Request):
 
     else:
         raise InvalidRequest
+
+
+def logout(socket, request: Request):
+    account = get_request_account(request)
+    if request.request_type == 'GET' and account:
+        response = http_200('text/html', FileIO('html/logged_out.html').read())
+        logout_cookie = Cookie(
+            name='auth_token',
+            value="logged-out",
+            max_age=0,
+            secure=False,
+            http_only=True
+        )
+        response.add_cookie(logout_cookie)
+        return socket.request.sendall(response.write_raw())
+
+    raise InvalidRequest
 
 
 def check_password(password: str) -> bool:
@@ -91,9 +102,10 @@ def check_password(password: str) -> bool:
             return False
     return True
 
+
 def register(socket, request: Request):
     if request.request_type == 'GET':
-        response = http_200('text/html', FileIO('html/register_response.html').read({'static': True}), 'utf-8')
+        response = http_200('text/html', FileIO('html/register.html').read({'static': True}), 'utf-8')
         socket.request.sendall(response.write_raw())
 
     elif request.request_type == 'POST':
@@ -105,7 +117,7 @@ def register(socket, request: Request):
 
         if not check_password(str(password)):
             arguments = {'static': False, 'username_taken': False, 'good_password': False}
-            response = http_200('text/html', FileIO('html/register_response.html').read(arguments), 'utf-8')
+            response = http_200('text/html', FileIO('html/register.html').read(arguments), 'utf-8')
             return socket.request.sendall(response.write_raw())
 
         # ██╗░░██╗░█████╗░░██████╗██╗░░██╗░░░░░░░░░░░░░░░░░░░░░░██████╗░█████╗░██╗░░░░░████████╗
@@ -122,29 +134,12 @@ def register(socket, request: Request):
 
         if account:
             arguments = {'static': False, 'username_taken': False, 'good_password': True, 'registered': True}
-            response = http_200('text/html', FileIO('html/register_response.html').read(arguments), 'utf-8')
+            response = http_200('text/html', FileIO('html/register.html').read(arguments), 'utf-8')
             return socket.request.sendall(response.write_raw())
         else:
             arguments = {'static': False, 'username_taken': True, 'good_password': True}
-            response = http_200('text/html', FileIO('html/register_response.html').read(arguments), 'utf-8')
+            response = http_200('text/html', FileIO('html/register.html').read(arguments), 'utf-8')
             return socket.request.sendall(response.write_raw())
 
     else:
         raise InvalidRequest
-
-
-def auth(socket, request: Request) -> bytes:
-    if request.request_type == 'GET':
-        if request.cookies and 'auth_token' in request.cookies:
-            salt = b'$2b$12$Fr9yR03IQLCGqjB1MJ9gfu'
-            auth_token_hash: str = bcrypt.hashpw(request.cookies['auth_token'].encode(), salt).decode()
-            account = get_account_from_token(auth_token_hash)
-
-            if account and account['auth_token_hash'] == auth_token_hash:
-                username = account['username']
-                arguments = {'username': username}
-                response = http_200('text/html', FileIO('html/big_yoshi_account.html').read(arguments), 'utf-8')
-                return socket.request.sendall(response.write_raw())
-
-        response = http_403('text/html', 'Please log in to view this content'.encode())
-        return socket.request.sendall(response.write_raw())

@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css">
+    <!-- Bootstrap Font Icon CSS -->
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.5.0/font/bootstrap-icons.css">
+        <link rel="stylesheet" type="text/css" href="style/calendar.css"/>
+
+    </head>
+    <body>
+
+        <nav class="navbar navbar-light px-3 mb-5" style="background-color: #e3f2fd;">
+            <a href="/" class="nav-link"><h3>Hangtime</h3></a>
+            <a href="/logout" class="nav-link m-0"><p>Logout</p></a>
+        </nav>
+
+        <div class="container my-3 mb-5 d-flex justify-content-between">
+            <a href="/chat" class="btn btn-primary py-3 px-4" role="button">Chat with friends</a>
+            <div id="new"><i class="bi bi-calendar-plus"></i></div>
+        </div>
+
+        <div class="container">
+            <div id="form">
+                <form action="/">
+                    <h1>Submit an event</h1>
+                    <label for="event-name">Event Name:</label><br>
+                    <input type="text" id="event-name" name="event-name" placeholder="Studying for CSE 220"><br>
+
+                    <label for="starttime">Start time:</label><br>
+                    <input type="time" id="starttime" name="starttime"><br>
+
+                    <label for="endtime">End time:</label><br>
+                    <input type="time" id="endtime" name="endtime"><br>
+
+                    <label for="event-name">Event Description:</label><br>
+                    <textarea rows="5" cols="30" type="text" id="description" name="description" placeholder="Reading The C Programming Language"></textarea><br>
+
+                    <input type="submit" value="Create" class="submit">
+                </form>
+            </div>
+            <div id="calendar"></div>
+        </div>
+	    <script src="script/script.js"></script>
+    </body>
+</html>

@@ -1,16 +1,19 @@
 from crablib.fileIO import FileIO
 from crablib.http.parse import Request, parse_frame, Frame
 from crablib.http.response import http_200, handshake_response, InvalidRequest
+from crablib.auth import get_request_account
 from db import messages
+from db import account as acc
 import json
 
 
 def index(socket, request: Request):
-    if request.request_type == 'GET':
-
+    account = get_request_account(request)
+    if request.request_type == 'GET' and account:
+        users = [a['username'] for a in acc.get_accounts()]
         response = http_200(
             content_type='text/html',
-            content=FileIO('html/chat.html').read(),
+            content=FileIO('html/chat.html').read({'users': users}),
             charset='utf-8',
         )
 

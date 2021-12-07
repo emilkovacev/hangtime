@@ -35,3 +35,6 @@ def add_token(username: str, auth_token_hash: str):
     account_collection.update_one(
         {'username': username},
         {'$set': {'auth_token_hash': auth_token_hash}})
+
+def get_accounts():
+    return account_collection.find()

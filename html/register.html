@@ -2,12 +2,17 @@
 <html>
     <head>
         <link rel="stylesheet" href="/style/style.css">
+        <link rel="stylesheet" href="/style/style.css">
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css">
+    <!-- Bootstrap Font Icon CSS -->
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.5.0/font/bootstrap-icons.css">
+
     </head>
 
     <body>
-        <h1 id="header">Create an Account</h1>
-        <div class="form-bg">
-            <form action="/register" method="post" enctype="multipart/form-data">
+        <div class="container d-flex justify-content-center"><h1>Create an Account</h1></div>
+        <div class="form-bg d-flex justify-content-between">
+            <form action="/register" method="post" enctype="multipart/form-data" class="m-3">
                 <label for="username">Email</label><br>
                 <input type="text" name="email"><br><br>
                 <label for="username">Username</label><br>
@@ -16,15 +21,6 @@
                 <input type="password" name="password"><br><br>
                 <input type="submit" value="Register"><br><br>
                 <a href="/">Log in</a>
-
-                <ul>
-                    Password Requirements
-                    <li>A minimum length of 8</li>
-                    <li>At least 1 lowercase character</li>
-                    <li>At least 1 uppercase character</li>
-                    <li>At least 1 number</li>
-                    <li>At least 1 special character</li>
-                </ul>
 
                 {% if static %}
 
@@ -37,9 +33,15 @@
                 {% elif registered %}
                     <p class="success">Account Registered!</p>
                 {% endif %}
-
-
             </form>
+            <ul class="list-group m-3 ">
+                <li class="list-group-item active">Password Requirements</li>
+                <li class="list-group-item">A minimum length of 8</li>
+                <li class="list-group-item">At least 1 lowercase character</li>
+                <li class="list-group-item">At least 1 uppercase character</li>
+                <li class="list-group-item">At least 1 number</li>
+                <li class="list-group-item">At least 1 special character</li>
+            </ul>
         </div>
 
     </body>

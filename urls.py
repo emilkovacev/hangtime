@@ -1,5 +1,5 @@
 from crablib.http.path import Path
-from views import static, chat, api, auth
+from views import static, chat, auth
 
 urls = [
     Path('^/$', static.index),
@@ -7,7 +7,7 @@ urls = [
     # login paths
     Path('^/login$', auth.login),
     Path('^/register$', auth.register),
-    Path('^/auth$', auth.auth),
+    Path('^/logout', auth.logout),
 
     # chat paths
     Path('^/chat$', chat.index),
@@ -18,8 +18,4 @@ urls = [
     Path('^/(images/[^.]+.(jpg|jpeg))$', static.img),
     Path('^/(style/[^.]+.css)$', static.css),
     Path('^/(script/[^.]+.js)$', static.js),
-
-    # RESTFUL API paths
-    Path('^/users$', api.routing),
-    Path('^/users/\\w+$', api.param_routing)
 ]

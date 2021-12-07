@@ -1,1 +1,1 @@
-HOST = 'mongo'
+HOST = 'localhost'
