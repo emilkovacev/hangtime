@@ -7,3 +7,4 @@ def generate_key(key: str) -> str:
     hashed_key: bytes = hashlib.sha1(key.encode() + GUID.encode()).digest()
     encoded_key = base64.b64encode(hashed_key)
     return encoded_key.decode()
+

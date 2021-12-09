@@ -1,5 +1,5 @@
 from crablib.http.path import Path
-from views import static, chat, auth
+from views import static, chat, auth, calendar
 
 urls = [
     Path('^/$', static.index),
@@ -13,6 +13,10 @@ urls = [
     Path('^/chat$', chat.index),
     Path('^/script/websocket.js$', chat.websocketjs),
     Path('^/websocket$', chat.websocket),
+
+    # calendar paths
+    Path('^/event$', calendar.event),
+    Path('^/calsocket$', calendar.websocket),
 
     # default paths
     Path('^/(images/[^.]+.(jpg|jpeg))$', static.img),

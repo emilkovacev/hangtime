@@ -23,6 +23,9 @@ var events_list = [
     new CalendarEvent('Event C', new Date('October 20, 2021 15:00'), new Date('October 20, 2021 18:00')),
     new CalendarEvent('Event A', new Date('October 20, 2021 23:00'), new Date('October 20, 2021 23:59')),
 ];
+//websocket
+const socket = new WebSocket('ws://' + window.location.host + '/calsocket');
+
 function intersections(event) {
     var count = 0;
     for (var i = 0; i < events_list.indexOf(event); i++) {
