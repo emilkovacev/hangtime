@@ -14,6 +14,7 @@ from urls import urls
 
 class CrabServer(socketserver.BaseRequestHandler):
     clients = []
+    chatclients = {}
 
     def handle(self):
         raw: bytes = self.request.recv(2048)

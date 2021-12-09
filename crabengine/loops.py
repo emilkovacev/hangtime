@@ -13,16 +13,24 @@ def replace_loop(matchobj: re.Match, arguments: Dict[str, Any]) -> str:
     var = matchobj.groupdict()['var']
     arg = matchobj.groupdict()['arg']
     content = matchobj.groupdict()['content']
+    attribute = matchobj.groupdict()['attribute']
 
     if arg not in arguments:
-        raise ArgNotFoundError(arg)
+        # raise ArgNotFoundError(arg)
+        return ''
 
     if type(arguments[arg]) == str:
-        arguments[var] = arguments[arg]
-        retval += variables.sub(replace_var, content) + '\n'
+        argval = arguments[arg]
+        if attribute:
+            argval = argval.__dict__[attribute]
+        arguments[var] = argval
+        retval += content + '\n'
     else:
         for i in arguments[arg]:
-            arguments[var] = i
-            retval += variables.sub(replace_var, content) + '\n'
+            argval = arguments[i]
+            if attribute:
+                argval = argval.__dict__[attribute]
+            arguments[var] = argval
+            retval += content + '\n'
 
     return retval
