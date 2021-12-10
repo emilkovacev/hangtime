@@ -23,7 +23,7 @@ var sort_events = function (a, b) {
     return 0;
 };
 // websocket frames + parsing
-var socket = new WebSocket('ws://' + window.location.host + '/websocket');
+var socket = new WebSocket('ws://' + window.location.host + '/calsocket');
 socket.onmessage = addEvent;
 function addEvent(frame) {
     console.log(frame);

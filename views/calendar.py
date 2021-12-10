@@ -22,6 +22,8 @@ def event_validate(event):
 def event(socket, request: Request):
     if request.request_type != "POST":
         raise InvalidRequest
+    if not request.body:
+        request.body = socket.request.recv(int(request.headers["Content-Length"]))
     encodedict = parse_form(request)
     formdict = {}
     for key in encodedict:
@@ -39,7 +41,6 @@ def event(socket, request: Request):
 def websocket(socket, request: Request) -> None:
     if request.request_type == 'GET':
         # implement websocket handshake
-        socket.clients.append(socket)
         key = request.headers['Sec-WebSocket-Key']
         response = handshake_response(key).write_raw()
         socket.request.sendall(response)
