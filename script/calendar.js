@@ -26,11 +26,9 @@ var sort_events = function (a, b) {
 var socket = new WebSocket('ws://' + window.location.host + '/calsocket');
 socket.onmessage = addEvent;
 function addEvent(frame) {
-
+    console.log(frame.data);
     var parsed = JSON.parse(frame.data);
-    console.log(parsed);
     var event = new CalEvent(parsed['event_name'], new Date('1970-01-01T' + parsed['start_time']), new Date('1970-01-01T' + parsed['end_time']), parsed['color'], parsed['description']);
-    console.log(event)
     events_list.push(event);
     events_list.sort(sort_events);
     loadEvents(events_list);
@@ -70,7 +68,9 @@ function intersections(event, events_list) {
 function generateEventBlock(event, events_list) {
     var calendar = document.getElementById('calendar');
     var eventBlock = document.createElement("div");
-    eventBlock.innerHTML = "<div class=\"content\">\n                          <b>" + event.name + "</b>\n                          <p>" + event.start_time.toLocaleTimeString() + " - " + event.end_time.toLocaleTimeString() + "</p>\n                          </div>";
+    var start_time = event.start_time.toLocaleString('en-US', { hour: 'numeric', hour12: true, minute: 'numeric' });
+    var end_time = event.end_time.toLocaleString('en-US', { hour: 'numeric', hour12: true, minute: 'numeric' });
+    eventBlock.innerHTML = "<div class=\"content\">\n                          <p><b>" + event.name + "</b><br/> " + start_time + " - " + end_time + "</p>\n                          </div>";
     eventBlock.className = 'event';
     var start = Math.round(parseTime(event.start_time)) + calendar.offsetTop + 20;
     var end = parseTime(event.end_time) + calendar.offsetTop + 20;
