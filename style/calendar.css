@@ -35,7 +35,7 @@ body {
 .event {
   position: absolute;
   margin-bottom: 10px;
-  font-size: 1.25rem;
+  font-size: 1rem;
   color: white;
   overflow: hidden;
   border-radius: 0.7rem;
@@ -48,7 +48,7 @@ body {
 }
 
 .content {
-  padding: 20px;
+  padding: 10px;
 }
 
 /* form */

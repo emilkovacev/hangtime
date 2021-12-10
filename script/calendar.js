@@ -12,8 +12,8 @@ var CalEvent = /** @class */ (function () {
 // this list should be sorted by date when populated!
 // sorting the list will help event layering work properly
 var events_list = [
-    new CalEvent('Event D', new Date('October 20, 2021 0:00'), new Date('October 20, 2021 23:59'), '#ff7961', ''),
-    new CalEvent('Event D', new Date('October 20, 2021 2:15'), new Date('October 20, 2021 22:00'), '#ff7961', ''),
+// new CalEvent('Event D', new Date('October 20, 2021 0:00'), new Date('October 20, 2021 23:59'), '#ff7961', ''),
+// new CalEvent('Event D', new Date('October 20, 2021 2:15'), new Date('October 20, 2021 22:00'), '#ff7961', ''),
 ];
 var sort_events = function (a, b) {
     if (a.start_time < b.start_time)
@@ -26,11 +26,12 @@ var sort_events = function (a, b) {
 var socket = new WebSocket('ws://' + window.location.host + '/calsocket');
 socket.onmessage = addEvent;
 function addEvent(frame) {
-    console.log(frame);
-    var parsed = JSON.parse(frame);
-    var event = new CalEvent(parsed['name'], new Date('1970-01-01T' + parsed['start_time']), new Date('1970-01-01T' + parsed['end_time']), parsed['color'], parsed['description']);
+    console.log(frame.data);
+    var parsed = JSON.parse(frame.data);
+    var event = new CalEvent(parsed['event_name'], new Date('1970-01-01T' + parsed['start_time']), new Date('1970-01-01T' + parsed['end_time']), parsed['color'], parsed['description']);
     events_list.push(event);
     events_list.sort(sort_events);
+    loadEvents(events_list);
 }
 var parseTime = function (date) { return date.getHours() * 60 + date.getMinutes(); };
 var SHIFT = 40;
