@@ -2,7 +2,7 @@ import json
 import time
 from datetime import datetime, timedelta
 
-from crablib.http.parse import Request, parse_form, Frame
+from crablib.http.parse import Request, parse_form, Frame, parse_frame
 from crablib.http.response import http_301, InvalidRequest, handshake_response
 from db.events import create_event, all_events, dict_event
 
@@ -57,7 +57,12 @@ def websocket(socket, request: Request) -> None:
 
 def calsock(socket):
     while True:
-        pass
+        raw: bytes = socket.request.recv(2048)
+        frame: Frame = parse_frame(raw)
+        if frame.opcode == 8:
+            socket.clients.remove(socket)
+            break
+
 
 
 def create_frame(body):

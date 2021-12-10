@@ -40,7 +40,7 @@ def load_prev_messages(socket):
             pass
 
 
-def load_message(socket):
+def load_message(socket, username):
     while True:
         raw: bytes = socket.request.recv(2048)
         frame: Frame = parse_frame(raw)
@@ -50,9 +50,15 @@ def load_message(socket):
         #messages.create_message(username=data['username'], comment=data['comment'])  # store message in db
 
         if data['username'] in socket.chatclients:
-            for client in socket.chatclients[data['username']]:                               # send message to each connected client
+            for client in socket.chatclients[data['username']]:                 # send message to each connected client
                 try:
-                    client.request.sendall(frame.write_raw())
+                    framedict = {
+                        "username": username,
+                        "comment": data['comment']
+                    }
+                    framejson = json.dumps(framedict).encode()
+                    sendframe = Frame(FIN=1, RSV1=0, RSV2=0, RSV3=0, opcode=1, MASK=0,data=framejson, payload_len=len(framejson))
+                    client.request.sendall(sendframe.write_raw())
                 except OSError:
                     pass
 
@@ -73,7 +79,7 @@ def websocket(socket, request: Request) -> None:
         socket.request.sendall(response)
 
         #load_prev_messages(socket)  # load messages sent before user loaded
-        load_message(socket)        # load any messages sent while websocket is open
+        load_message(socket, username)        # load any messages sent while websocket is open
 
     else:
         raise InvalidRequest
