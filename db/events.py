@@ -25,6 +25,16 @@ def create_event(event_name: str, description: str, start_time: str, end_time: s
 
     return event
 
+def dict_event(event_name: str, description: str, start_time: str, end_time: str, color: str):
+    event = {
+        'event_name': event_name,
+        'description': description,
+        'start_time': start_time,
+        'end_time': end_time,
+        'color': color
+    }
+    return event
+
 def find_event(_id: ObjectId):
     return event_collection.find_one({'_id': _id})
 

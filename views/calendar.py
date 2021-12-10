@@ -4,7 +4,7 @@ from datetime import datetime, timedelta
 
 from crablib.http.parse import Request, parse_form, Frame
 from crablib.http.response import http_301, InvalidRequest, handshake_response
-from db.events import create_event, all_events
+from db.events import create_event, all_events, dict_event
 
 
 def event_validate(event):
@@ -31,8 +31,9 @@ def event(socket, request: Request):
     #print("formdict", formdict)
     if event_validate(formdict):
         create_event(formdict["event-name"], formdict["description"], formdict["starttime"], formdict["endtime"], formdict["color"])
+        event = dict_event(formdict["event-name"], formdict["description"], formdict["starttime"], formdict["endtime"], formdict["color"])
         for client in socket.clients:
-            frame = create_frame(formdict)
+            frame = create_frame(event)
             send_frame(client, frame)
     response = http_301("/")
     socket.request.sendall(response.write_raw())

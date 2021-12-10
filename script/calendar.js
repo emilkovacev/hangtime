@@ -26,9 +26,11 @@ var sort_events = function (a, b) {
 var socket = new WebSocket('ws://' + window.location.host + '/calsocket');
 socket.onmessage = addEvent;
 function addEvent(frame) {
-    console.log(frame.data);
+
     var parsed = JSON.parse(frame.data);
+    console.log(parsed);
     var event = new CalEvent(parsed['event_name'], new Date('1970-01-01T' + parsed['start_time']), new Date('1970-01-01T' + parsed['end_time']), parsed['color'], parsed['description']);
+    console.log(event)
     events_list.push(event);
     events_list.sort(sort_events);
     loadEvents(events_list);
