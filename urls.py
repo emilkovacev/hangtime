@@ -11,7 +11,6 @@ urls = [
 
     # chat paths
     Path('^/chat$', chat.index),
-    Path('^/script/websocket.js$', chat.websocketjs),
     Path('^/websocket$', chat.websocket),
 
     # calendar paths

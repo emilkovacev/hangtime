@@ -8,18 +8,20 @@ db = mongo_client['chatapp']
 
 event_collection = db['events']
 
-def create_event(event_name: str, description: str, start_time: str, end_time: str):
+def create_event(event_name: str, description: str, start_time: str, end_time: str, color: str):
     event = event_collection.insert_one({
         'event_name': event_name,
         'description': description,
         'start_time': start_time,
         'end_time': end_time,
+        'color': color
     })
 
     print(f'Registered: {event_name}\n'
           f'description: {description}\n'
           f'start_time: {start_time}\n'
-          f'end_time: {end_time}\n')
+          f'end_time: {end_time}\n'
+          f'color: {color}\n')
 
     return event
 
