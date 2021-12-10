@@ -20,8 +20,8 @@ class CalEvent {
 // sorting the list will help event layering work properly
 
 let events_list: CalEvent[] = [
-  new CalEvent('Event D', new Date('October 20, 2021 0:00'), new Date('October 20, 2021 23:59'), '#ff7961', ''),
-  new CalEvent('Event D', new Date('October 20, 2021 2:15'), new Date('October 20, 2021 22:00'), '#ff7961', ''),
+  // new CalEvent('Event D', new Date('October 20, 2021 0:00'), new Date('October 20, 2021 23:59'), '#ff7961', ''),
+  // new CalEvent('Event D', new Date('October 20, 2021 2:15'), new Date('October 20, 2021 22:00'), '#ff7961', ''),
 ];
 
 const sort_events = (a: CalEvent, b: CalEvent) => {
@@ -32,7 +32,7 @@ const sort_events = (a: CalEvent, b: CalEvent) => {
 
 
 // websocket frames + parsing
-const socket = new WebSocket('ws://' + window.location.host + '/websocket');
+var socket = new WebSocket('ws://' + window.location.host + '/calsocket');
 socket.onmessage = addEvent
 
 
@@ -47,11 +47,11 @@ interface Frame {
 }
 
 function addEvent(frame) {
-  console.log(frame)
+  console.log(frame.data)
 
-  const parsed: Frame = JSON.parse(frame);
+  const parsed: Frame = JSON.parse(frame.data);
   const event: CalEvent = new CalEvent(
-      parsed['name'],
+      parsed['event_name'],
       new Date('1970-01-01T' + parsed['start_time']),
       new Date('1970-01-01T' + parsed['end_time']),
       parsed['color'],
@@ -59,6 +59,7 @@ function addEvent(frame) {
   )
   events_list.push(event)
   events_list.sort(sort_events)
+  loadEvents(events_list);
 }
 
 const parseTime = (date: Date) => date.getHours() * 60 + date.getMinutes();
@@ -137,4 +138,3 @@ function load() {
 
 document.addEventListener('DOMContentLoaded', load);
 document.getElementById('new').addEventListener('click', toggleEventForm)
-
