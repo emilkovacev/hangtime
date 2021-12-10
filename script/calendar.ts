@@ -20,7 +20,7 @@ class CalendarEvent {
 }
 
 const parseTime = (date: Date) => date.getHours() * 60 + date.getMinutes();
-
+const socket = new WebSocket('ws://' + window.location.host + '/calsocket');
 
 // this list should be sorted by date when populated!
 // sorting the list will help event layering work properly

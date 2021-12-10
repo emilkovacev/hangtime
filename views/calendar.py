@@ -29,6 +29,9 @@ def event(socket, request: Request):
     #print("formdict", formdict)
     if event_validate(formdict):
         create_event(formdict["event-name"], formdict["description"], formdict["starttime"], formdict["endtime"])
+        for client in socket.clients:
+            frame = create_frame(formdict)
+            send_frame(client, frame)
     response = http_301("/")
     socket.request.sendall(response.write_raw())
 
@@ -40,28 +43,25 @@ def websocket(socket, request: Request) -> None:
         key = request.headers['Sec-WebSocket-Key']
         response = handshake_response(key).write_raw()
         socket.request.sendall(response)
+        socket.clients.append(socket)
+        allevents = all_events()
+        for events in allevents:
+            frame = create_frame(events)
+            send_frame(socket, frame)
         calsock(socket)
-
     else:
         raise InvalidRequest
 
 
 def calsock(socket):
-    sent = []
     while True:
-        all = all_events()
-        for event in all:
-            if event["_id"] not in sent:
-                sent.append(event["_id"])
-                frame = create_frame(event)
-                send_frame(socket, frame)
-                #print(event)
-        #time.sleep(0.5)
+        pass
 
 
 def create_frame(body):
     bopy = body.copy()
-    bopy.pop('_id')
+    if '_id' in bopy:
+        bopy.pop('_id')
     b = json.dumps(bopy)
     bencode = b.encode("ascii")
     frame = Frame(1, 0, 0, 0, 1, 0, len(bencode), bencode)
@@ -70,4 +70,5 @@ def create_frame(body):
 
 
 def send_frame(socket, frame):
+    #print("sent frame babey")
     socket.request.sendall(frame)
