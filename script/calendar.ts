@@ -76,7 +76,6 @@ function loadEvents(events_list: CalEvent[]): void {
 }
 
 // Count the number of intersections of one event with all others
-
 // Is used to determine how many pixels to shift each event on overlaps
 
 function intersections(event: CalEvent, events_list: CalEvent[]): number {
@@ -95,13 +94,6 @@ function intersections(event: CalEvent, events_list: CalEvent[]): number {
 function generateEventBlock(event: CalEvent, events_list: CalEvent[]) {
   const calendar = document.getElementById('calendar');
   const eventBlock = document.createElement("div");
-
-  /*
-    Set eventBlock for inner HTML:
-    eventName
-    12:30PM - 3:00PM
-  */
-
   eventBlock.innerHTML = `<div class="content">
                           <b>${event.name}</b>
                           <p>${event.start_time.toLocaleTimeString()} - ${event.end_time.toLocaleTimeString()}</p>
@@ -109,13 +101,8 @@ function generateEventBlock(event: CalEvent, events_list: CalEvent[]) {
 
   eventBlock.className = 'event';
 
-
   const start: number = Math.round(parseTime(event.start_time)) + calendar.offsetTop + 20;
   const end: number = parseTime(event.end_time) + calendar.offsetTop + 20;
-
-  /*
-    Set eventBlock styles
-  */
 
   eventBlock.style.top = (Math.round(start)).toString() + 'px';
   eventBlock.style.height = (Math.round(end-start)).toString() + 'px';

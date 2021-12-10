@@ -8,7 +8,7 @@ from db.events import create_event, all_events
 
 
 def event_validate(event):
-    #print("validating", event)
+    # print("validating", event)
     start = datetime.strptime(event["starttime"], '%H:%M').time()
     end = datetime.strptime(event["endtime"], '%H:%M').time()
     diff = timedelta(hours=end.hour, minutes=end.minute) - timedelta(hours=start.hour, minutes=start.minute)
@@ -26,9 +26,14 @@ def event(socket, request: Request):
     formdict = {}
     for key in encodedict:
         formdict[key] = encodedict[key].decode("ascii")
-    #print("formdict", formdict)
+    # print("formdict", formdict)
     if event_validate(formdict):
-        create_event(formdict["event-name"], formdict["description"], formdict["starttime"], formdict["endtime"])
+        create_event(
+            formdict["event-name"],
+            formdict["description"],
+            formdict["starttime"],
+            formdict["endtime"],
+            formdict["color"])
     response = http_301("/")
     socket.request.sendall(response.write_raw())
 
@@ -55,8 +60,8 @@ def calsock(socket):
                 sent.append(event["_id"])
                 frame = create_frame(event)
                 send_frame(socket, frame)
-                #print(event)
-        #time.sleep(0.5)
+                # print(event)
+        # time.sleep(0.5)
 
 
 def create_frame(body):
@@ -65,7 +70,7 @@ def create_frame(body):
     b = json.dumps(bopy)
     bencode = b.encode("ascii")
     frame = Frame(1, 0, 0, 0, 1, 0, len(bencode), bencode)
-    #print(frame)
+    # print(frame)
     return frame.write_raw()
 
 
