@@ -28,7 +28,7 @@ def event(socket, request: Request):
         formdict[key] = encodedict[key].decode("ascii")
     #print("formdict", formdict)
     if event_validate(formdict):
-        create_event(formdict["event-name"], formdict["description"], formdict["starttime"], formdict["endtime"])
+        create_event(formdict["event-name"], formdict["description"], formdict["starttime"], formdict["endtime"], formdict["color"])
         for client in socket.clients:
             frame = create_frame(formdict)
             send_frame(client, frame)
