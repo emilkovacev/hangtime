@@ -35,10 +35,10 @@ body {
 .event {
   position: absolute;
   margin-bottom: 10px;
-  font-size: 1rem;
+  font-size: 0.9rem;
   color: white;
   overflow: hidden;
-  border-radius: 0.7rem;
+  border-radius: 0.2rem;
   border: 2px solid white;
 }
 
@@ -48,7 +48,7 @@ body {
 }
 
 .content {
-  padding: 10px;
+  padding: 4px 10px;
 }
 
 /* form */
