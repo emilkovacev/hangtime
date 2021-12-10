@@ -95,9 +95,11 @@ function intersections(event: CalEvent, events_list: CalEvent[]): number {
 function generateEventBlock(event: CalEvent, events_list: CalEvent[]) {
   const calendar = document.getElementById('calendar');
   const eventBlock = document.createElement("div");
+
+  const start_time = event.start_time.toLocaleString('en-US', { hour: 'numeric', hour12: true, minute: 'numeric' })
+  const end_time = event.end_time.toLocaleString('en-US', { hour: 'numeric', hour12: true, minute: 'numeric' })
   eventBlock.innerHTML = `<div class="content">
-                          <b>${event.name}</b>
-                          <p>${event.start_time.toLocaleTimeString()} - ${event.end_time.toLocaleTimeString()}</p>
+                          <p><b>${event.name}</b><br/> ${start_time} - ${end_time}</p>
                           </div>`;
 
   eventBlock.className = 'event';
