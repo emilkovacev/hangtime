@@ -23,7 +23,7 @@
         <div class="container"><h1>Chat</h1></div>
 
         <div class="container d-flex mb-3">
-            <select class="form-select me-3" aria-label="Default select example" style="width: 200px;">
+            <select class="form-select me-3" aria-label="Default select example" style="width: 200px;" id="chat-name">
                 <option selected>-</option>
                 {% for user in users %}
                     <option value="{{ user }}">{{ user }}</option>
@@ -36,8 +36,10 @@
             <button onclick="sendMessage()" class="btn btn-primary mb-3">Chat</button>
         </div>
 
+        <div class="container-md">
+            <div id="chat"></div>
+        </div>
 
-        <div id="chat"></div>
         <script src="../script/websocket.js"></script>
     </body>
 </html>
