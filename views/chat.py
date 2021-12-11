@@ -14,10 +14,10 @@ from db.account import get_account_from_token
 def index(socket, request: Request):
     account = get_request_account(request)
     if request.request_type == 'GET' and account:
-        users = [a['username'] for a in acc.get_accounts()]
+        users = [a['username'] for a in acc.get_accounts({'status': 'online'})]
         response = http_200(
             content_type='text/html',
-            content=FileIO('html/chat.html').read({'users': users}),
+            content=FileIO('html/chat.html').read({'users': users, 'username': account['username']}),
             charset='utf-8',
         )
 

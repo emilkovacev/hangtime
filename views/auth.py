@@ -8,7 +8,8 @@ from crablib.fileIO import FileIO
 from crablib.http.parse import Request, parse_form, Response, Cookie
 from crablib.http.response import http_200, InvalidRequest, http_301, http_403
 from crablib.auth import get_request_account
-from db.account import create_account, get_account, add_token, get_account_from_token
+from db.account import create_account, get_account, add_token, \
+    get_account_from_token, login as dblogin, logout as dblogout
 
 
 
@@ -59,6 +60,8 @@ def login(socket, request: Request):
             auth_token_hash = bcrypt.hashpw(auth_token.encode(), auth_token_salt)
             add_token(username, auth_token_hash.decode())
 
+            dblogin(username)
+
             print('successful login')
             return socket.request.sendall(response.write_raw())
 
@@ -84,6 +87,7 @@ def logout(socket, request: Request):
             http_only=True
         )
         response.add_cookie(logout_cookie)
+        dblogout(account['username'])
         return socket.request.sendall(response.write_raw())
 
     raise InvalidRequest

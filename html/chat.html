@@ -10,14 +10,17 @@
     <body>
         <nav class="navbar navbar-light px-3 mb-5" style="background-color: #e3f2fd;">
             <a href="/" class="nav-link"><h3>Hangtime</h3></a>
+            <p>{{ username }}</p>
             <a href="/logout" class="nav-link"><p>Logout</p></a>
         </nav>
 
-        <div class="container">
+        <div class="container mb-5">
             <h1>Users</h1>
+            <div class="d-flex">
             {% for user in users %}
-                {{ user }}
+                <div class="rounded user-block d-flex justify-content-center align-items-center me-1">{{ user }}</div>
             {% endfor %}
+            </div>
         </div>
 
         <div class="container"><h1>Chat</h1></div>

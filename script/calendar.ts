@@ -123,7 +123,7 @@ function toggleEventForm() {
   if (form.style.display === 'flex') {
     form.style.display = 'none';
     calendar.style.display = 'block';
-    new_button.innerHTML = '<i class="bi bi-circle-plus"></i>';
+    new_button.innerHTML = '<i class="bi bi-calendar-plus"></i>';
   } else {
     form.style.display = 'flex';
     calendar.style.display = 'none';

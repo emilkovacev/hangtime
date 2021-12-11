@@ -36,5 +36,15 @@ def add_token(username: str, auth_token_hash: str):
         {'username': username},
         {'$set': {'auth_token_hash': auth_token_hash}})
 
-def get_accounts():
-    return account_collection.find()
+def get_accounts(params=None):
+    return account_collection.find(params)
+
+def login(username: str):
+    account_collection.update_one(
+        {'username': username},
+        {'$set': {'status': 'online'}})
+
+def logout(username: str):
+    account_collection.update_one(
+        {'username': username},
+        {'$set': {'status': 'offline'}})
