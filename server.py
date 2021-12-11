@@ -4,6 +4,7 @@ import socketserver
 from random import randint
 import traceback
 import webbrowser
+import argparse
 
 from crablib.fileIO import FileIO
 from crablib.http.parse import Request, parse_request
@@ -43,6 +44,12 @@ class CrabServer(socketserver.BaseRequestHandler):
 
 if __name__ == '__main__':
     HOST, PORT = '0.0.0.0', 8000
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--bind", type=str, help="bind host and port")
+    args = parser.parse_args()
+    if args.bind:
+        HOST, PORT = args.bind.split(':')
+
     print(f'starting server for {HOST} at {PORT}')
     with socketserver.ThreadingTCPServer((HOST, PORT), CrabServer) as server:
         webbrowser.open(f'http://localhost:{PORT}')
