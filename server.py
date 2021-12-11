@@ -25,7 +25,6 @@ class CrabServer(socketserver.BaseRequestHandler):
         self.match(request)
 
     def match(self, request):
-        response_404 = http_404('text/html', FileIO('html/404.html').read())
 
         item: Path
         for item in urls:
@@ -35,10 +34,10 @@ class CrabServer(socketserver.BaseRequestHandler):
                     item.view(self, request)
                     return
                 except Exception as e:
+                    arguments = {'exception': e, 'traceback': traceback.format_exc()}
+                    response_404 = http_404('text/html', FileIO('html/error.html').read(arguments))
                     self.request.sendall(response_404.write_raw())
-                    print(e)
-                    print(traceback.format_exc())
-                    print('----------------------')
+        response_404 = http_404('text/html', FileIO('html/error.html').read())
         self.request.sendall(response_404.write_raw())
 
 
