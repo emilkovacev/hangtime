@@ -16,11 +16,12 @@ document.addEventListener("keypress", function (event) {
 function sendMessage() {
    const chatName = document.getElementById("chat-name").value;
    const chatBox = document.getElementById("chat-comment");
+   const current_username = document.getElementById("current-username");
    const comment = chatBox.value;
    chatBox.value = "";
    chatBox.focus();
    if(comment !== "") {
-       socket.send(JSON.stringify({'username': chatName, 'comment': comment}));
+       socket.send(JSON.stringify({'current_username': current_username, 'username': chatName, 'comment': comment}));
    }
 }
 

@@ -15,6 +15,7 @@ def index(socket, request: Request):
     account = get_request_account(request)
     if request.request_type == 'GET' and account:
         users = [a['username'] for a in acc.get_accounts({'status': 'online'})]
+        users.remove(account['username'])
         response = http_200(
             content_type='text/html',
             content=FileIO('html/chat.html').read({'users': users, 'username': account['username']}),
@@ -50,17 +51,19 @@ def load_message(socket, username):
         #messages.create_message(username=data['username'], comment=data['comment'])  # store message in db
 
         if data['username'] in socket.chatclients:
-            for client in socket.chatclients[data['username']]:                 # send message to each connected client
+            framedict = {
+                "username": username,
+                "comment": data['comment']
+            }
+            framejson = json.dumps(framedict).encode()
+            sendframe = Frame(FIN=1, RSV1=0, RSV2=0, RSV3=0, opcode=1, MASK=0,data=framejson, payload_len=len(framejson))
+            socket.request.sendall(sendframe.write_raw())
+            for client in socket.chatclients[data['username']]:  # send message to each connected client
                 try:
-                    framedict = {
-                        "username": username,
-                        "comment": data['comment']
-                    }
-                    framejson = json.dumps(framedict).encode()
-                    sendframe = Frame(FIN=1, RSV1=0, RSV2=0, RSV3=0, opcode=1, MASK=0,data=framejson, payload_len=len(framejson))
                     client.request.sendall(sendframe.write_raw())
                 except OSError:
                     pass
+
 
 
 def websocket(socket, request: Request) -> None:
