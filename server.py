@@ -51,6 +51,6 @@ if __name__ == '__main__':
         HOST, PORT = args.bind.split(':')
 
     print(f'starting server for {HOST} at {PORT}')
-    with socketserver.ThreadingTCPServer((HOST, PORT), CrabServer) as server:
+    with socketserver.ThreadingTCPServer((HOST, int(PORT)), CrabServer) as server:
         webbrowser.open(f'http://localhost:{PORT}')
         server.serve_forever()
