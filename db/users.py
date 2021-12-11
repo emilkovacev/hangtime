@@ -1,9 +1,9 @@
 from bson import ObjectId
 from pymongo import MongoClient
+from db import conn_str
 
-from db import HOST
 
-mongo_client = MongoClient(HOST)
+mongo_client = MongoClient(conn_str, serverSelectionTimeoutMS=5000)
 db = mongo_client['chatapp']
 
 user_collection = db['users']

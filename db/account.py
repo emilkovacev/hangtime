@@ -1,8 +1,8 @@
 from pymongo import MongoClient
 
-from db import HOST
+from db import conn_str
 
-mongo_client = MongoClient(HOST)
+mongo_client = MongoClient(conn_str, serverSelectionTimeoutMS=5000)
 db = mongo_client['chatapp']
 
 account_collection = db['accounts']
