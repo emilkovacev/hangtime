@@ -1,5 +1,7 @@
 // Establish a WebSocket connection with the server
-const socket = new WebSocket('ws://' + window.location.host + '/websocket');
+const url = 'ws://' + window.location.host + '/websocket'
+const socket = new WebSocket(url);
+console.log(url)
 
 // Call the addMessage function whenever data is received from the server over the WebSocket
 socket.onmessage = addMessage;
