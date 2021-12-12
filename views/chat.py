@@ -1,4 +1,5 @@
 import bcrypt
+import sys
 
 from crablib.fileIO import FileIO
 from crablib.http.parse import Request, parse_frame, Frame
@@ -68,6 +69,7 @@ def load_message(socket, username):
 
 def websocket(socket, request: Request) -> None:
     print(f'websocket headers: {request.headers}')
+    sys.stdout.flush()
     if request.request_type == 'GET':
         # implement websocket handshake
         auth_token = request.cookies['auth_token']

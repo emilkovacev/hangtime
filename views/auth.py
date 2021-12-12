@@ -3,6 +3,7 @@ import string
 from typing import Dict
 import bcrypt
 import secrets
+import sys
 
 from crablib.fileIO import FileIO
 from crablib.http.parse import Request, parse_form, Response, Cookie
@@ -21,6 +22,7 @@ def login(socket, request: Request):
     elif request.request_type == 'POST':
         form: Dict[str, bytes] = parse_form(request)
         print(f'form: {form}')
+        sys.stdout.flush()
         username = form['username'].decode()
         password = form['password']
 
