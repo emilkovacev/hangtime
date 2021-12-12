@@ -42,7 +42,7 @@ def event(socket, request: Request):
 def websocket(socket, request: Request) -> None:
     if request.request_type == 'GET':
         # implement websocket handshake
-        key = request.headers['Sec-WebSocket-Key']
+        key = request.headers.get('Sec-WebSocket-Key', request.headers['Sec-Websocket-Key'])
         response = handshake_response(key).write_raw()
         socket.request.sendall(response)
         socket.clients.append(socket)
