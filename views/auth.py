@@ -20,6 +20,7 @@ def login(socket, request: Request):
 
     elif request.request_type == 'POST':
         form: Dict[str, bytes] = parse_form(request)
+        print(f'form: {form}')
         username = form['username'].decode()
         password = form['password']
 

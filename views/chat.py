@@ -67,6 +67,7 @@ def load_message(socket, username):
 
 
 def websocket(socket, request: Request) -> None:
+    print(f'websocket headers: {request.headers}')
     if request.request_type == 'GET':
         # implement websocket handshake
         auth_token = request.cookies['auth_token']
