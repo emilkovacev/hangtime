@@ -80,8 +80,8 @@ def websocket(socket, request: Request) -> None:
             socket.chatclients[username].append(socket)
         else:
             socket.chatclients[username] = [socket]
-            
-        key = request.headers.get('Sec-WebSocket-Key', headers['Sec-Websocket-Key'])
+
+        key = request.headers.get('Sec-WebSocket-Key', request.headers['Sec-Websocket-Key'])
         response = handshake_response(key).write_raw()
         socket.request.sendall(response)
 
