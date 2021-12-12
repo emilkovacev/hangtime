@@ -5,7 +5,7 @@ from crablib.fileIO import FileIO
 from crablib.http.parse import Request, parse_frame, Frame
 from crablib.http.response import http_200, handshake_response, InvalidRequest
 from crablib.auth import get_request_account
-import crablib.misc
+from crablib.misc import print
 from db import messages
 from db import account as acc
 import json
@@ -69,7 +69,7 @@ def load_message(socket, username):
 
 
 def websocket(socket, request: Request) -> None:
-    misc.print(f'websocket headers: {request.headers}')
+    print(f'websocket headers: {request.headers}')
     if request.request_type == 'GET':
         # implement websocket handshake
         auth_token = request.cookies['auth_token']
@@ -82,7 +82,7 @@ def websocket(socket, request: Request) -> None:
             socket.chatclients[username] = [socket]
 
         key = request.headers.get('Sec-WebSocket-Key', request.headers['Sec-Websocket-Key'])
-        misc.print(key)
+        print(key)
         response = handshake_response(key).write_raw()
         socket.request.sendall(response)
 
