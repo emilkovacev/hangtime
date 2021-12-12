@@ -1,5 +1,5 @@
 import sys
 
-def print(x):
+def flush_print(x):
     print(x)
     sys.stdout.flush()
