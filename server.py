@@ -34,7 +34,7 @@ class CrabServer(socketserver.BaseRequestHandler):
                     item.view(self, request)
                     return
                 except Exception as e:
-                    arguments = {'exception': e, 'traceback': traceback.format_exc()}
+                    arguments = {'exception': e, 'traceback': traceback.print_tb(e)}
                     response_404 = http_404('text/html', FileIO('html/error.html').read(arguments))
                     self.request.sendall(response_404.write_raw())
         response_404 = http_404('text/html', FileIO('html/error.html').read())
@@ -42,7 +42,7 @@ class CrabServer(socketserver.BaseRequestHandler):
 
 
 if __name__ == '__main__':
-    HOST, PORT = '0.0.0.0', 8000
+    HOST, PORT = '0.0.0.0', randint(1000, 9999)
     parser = argparse.ArgumentParser()
     parser.add_argument("--bind", type=str, help="bind host and port")
     args = parser.parse_args()
