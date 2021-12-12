@@ -4,6 +4,7 @@ from typing import Dict
 import bcrypt
 import secrets
 import sys
+import crablib.misc
 
 from crablib.fileIO import FileIO
 from crablib.http.parse import Request, parse_form, Response, Cookie
@@ -21,8 +22,7 @@ def login(socket, request: Request):
 
     elif request.request_type == 'POST':
         form: Dict[str, bytes] = parse_form(request)
-        print(f'form: {form}')
-        sys.stdout.flush()
+        misc.print(f'form: {form}')
         username = form['username'].decode()
         password = form['password']
 
@@ -65,11 +65,11 @@ def login(socket, request: Request):
 
             dblogin(username)
 
-            print('successful login')
+            misc.print('successful login')
             return socket.request.sendall(response.write_raw())
 
         else:
-            print('failed login attempt')
+            misc.print('failed login attempt')
             arguments = {'username_exists': True, 'correct_password': False}
             response: Response = http_200('text/html', FileIO('html/login.html').read(arguments), 'utf-8')
             return socket.request.sendall(response.write_raw())
@@ -120,7 +120,7 @@ def register(socket, request: Request):
         email = form['email'].decode()
         username = form['username'].decode()
         password = form['password']
-        print(password)
+        misc.print(password)
 
         if not check_password(str(password)):
             arguments = {'static': False, 'username_taken': False, 'good_password': False}

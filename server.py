@@ -25,7 +25,6 @@ class CrabServer(socketserver.BaseRequestHandler):
         self.match(request)
 
     def match(self, request):
-
         item: Path
         for item in urls:
             match = re.match(item.regex, request.path)
