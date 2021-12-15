@@ -5,6 +5,7 @@ from datetime import datetime, timedelta
 from crablib.http.parse import Request, parse_form, Frame, parse_frame
 from crablib.http.response import http_301, InvalidRequest, handshake_response
 from db.events import create_event, all_events, dict_event
+from crablib.misc import flush_print
 
 
 def event_validate(event):
@@ -48,9 +49,11 @@ def websocket(socket, request: Request) -> None:
         socket.clients.append(socket)
         allevents = all_events()
         for events in allevents:
+            flush_print(events)
             frame = create_frame(events)
             send_frame(socket, frame)
         calsock(socket)
+
     else:
         raise InvalidRequest
 
