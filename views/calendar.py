@@ -80,5 +80,8 @@ def create_frame(body):
 
 def send_frame(socket, frame):
     #print("sent frame babey")
-    flush_print(socket)
-    socket.request.sendall(frame)
+    try:
+        socket.request.sendall(frame)
+    except Exception:
+        flush_print("you win some you lose some")
+
