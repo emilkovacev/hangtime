@@ -72,7 +72,7 @@ function generateEventBlock(event, events_list) {
     var eventBlock = document.createElement("div");
     var start_time = event.start_time.toLocaleString('en-US', { hour: 'numeric', hour12: true, minute: 'numeric' });
     var end_time = event.end_time.toLocaleString('en-US', { hour: 'numeric', hour12: true, minute: 'numeric' });
-    eventBlock.innerHTML = "<div class=\"content\">\n                          <p><b>" + event.name + "</b><br/> " + start_time + " - " + end_time + "</p>\n                          </div>";
+    eventBlock.innerHTML = "<div class=\"content\">\n                          <p><b>" + event.name + "</b><br/> " + start_time + " - " + end_time + "</p>\n                          <p>" + event.description + "</p>\n                          </div>";
     eventBlock.className = 'event';
     var start = Math.round(parseTime(event.start_time)) + calendar.offsetTop + 20;
     var end = parseTime(event.end_time) + calendar.offsetTop + 20;
