@@ -34,6 +34,8 @@ def event(socket, request: Request):
         create_event(formdict["event-name"], formdict["description"], formdict["starttime"], formdict["endtime"], formdict["color"])
         event = dict_event(formdict["event-name"], formdict["description"], formdict["starttime"], formdict["endtime"], formdict["color"])
         for client in socket.clients:
+            flush_print("sending:")
+            flush_print(event)
             frame = create_frame(event)
             send_frame(client, frame)
     response = http_301("/")
@@ -48,8 +50,9 @@ def websocket(socket, request: Request) -> None:
         socket.request.sendall(response)
         socket.clients.append(socket)
         allevents = all_events()
+        flush_print("allevents:")
+        flush_print(allevents)
         for events in allevents:
-            flush_print(events)
             frame = create_frame(events)
             send_frame(socket, frame)
         calsock(socket)
