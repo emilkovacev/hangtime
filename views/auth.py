@@ -117,6 +117,7 @@ def register(socket, request: Request):
 
     elif request.request_type == 'POST':
         form: Dict[str, bytes] = parse_form(request)
+        flush_print(form)
         email = form['email'].decode()
         username = form['username'].decode()
         password = form['password']
