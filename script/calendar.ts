@@ -32,7 +32,7 @@ const sort_events = (a: CalEvent, b: CalEvent) => {
 
 
 // websocket frames + parsing
-const url = 'ws://' + window.location.host + '/websocket'
+const url = 'ws://' + window.location.host + '/calsocket'
 const socket = new WebSocket(url);
 console.log(url)
 
