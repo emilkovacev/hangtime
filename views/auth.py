@@ -116,6 +116,9 @@ def register(socket, request: Request):
         socket.request.sendall(response.write_raw())
 
     elif request.request_type == 'POST':
+        leng = int(request.headers["Content-Length"])
+        while len(request.body) < leng:
+            request.body += socket.request.recv(2048)
         form: Dict[str, bytes] = parse_form(request)
         flush_print(form)
         email = form['email'].decode()
