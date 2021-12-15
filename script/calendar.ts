@@ -103,6 +103,7 @@ function generateEventBlock(event: CalEvent, events_list: CalEvent[]) {
   const end_time = event.end_time.toLocaleString('en-US', { hour: 'numeric', hour12: true, minute: 'numeric' })
   eventBlock.innerHTML = `<div class="content">
                           <p><b>${event.name}</b><br/> ${start_time} - ${end_time}</p>
+                          <p>${event.description}</p>
                           </div>`;
 
   eventBlock.className = 'event';
